@@ -7,10 +7,10 @@ import { LayoutDashboard, History, Settings, ArrowLeftRight } from 'lucide-react
 import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Transactions', href: '/transactions', icon: ArrowLeftRight },
-  { name: 'History', href: '/history', icon: History },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Dashboard', href: '/main/dashboard', icon: LayoutDashboard },
+  { name: 'Transactions', href: '/main/transactions', icon: ArrowLeftRight },
+  { name: 'History', href: '/main/history', icon: History },
+  { name: 'Settings', href: '/main/settings', icon: Settings },
 ];
 
 export default function DashboardLayout({

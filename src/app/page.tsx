@@ -13,7 +13,7 @@ export default function Home() {
             Supply liquidity to tokenized real-world assets.
           </p>
           <div className="pt-4">
-            <Link href="/dashboard">
+            <Link href="/main/dashboard">
               <Button size="lg" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
                 Launch App
               </Button>
