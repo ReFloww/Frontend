@@ -4,67 +4,99 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle2, Shield, Zap, TrendingUp, Lock, Users } from 'lucide-react';
+import { Building2, TrendingUp, Sprout, Fish, TreePine } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-const features = [
+// Mock data for borrower loan requests
+const borrowerLoans = [
   {
-    icon: Shield,
-    title: 'Secured by RWA',
-    description: 'All loans backed by tokenized real-world assets with transparent on-chain verification'
+    id: '1',
+    businessName: 'Green Valley Farms',
+    sector: 'Agriculture',
+    purpose: 'Purchase of fertilizers and seeds',
+    loanAmount: 50000,
+    interestRate: 8.5,
+    tenor: 12,
+    creditRating: 'A',
+    icon: Sprout,
   },
   {
-    icon: Zap,
-    title: 'Instant Liquidity',
-    description: 'Deploy capital and start earning interest immediately with automated matching'
+    id: '2',
+    businessName: 'Ocean Harvest Co.',
+    sector: 'Fisheries',
+    purpose: 'Upgrade fishing equipment',
+    loanAmount: 75000,
+    interestRate: 10.2,
+    tenor: 18,
+    creditRating: 'B',
+    icon: Fish,
   },
   {
-    icon: TrendingUp,
-    title: 'Competitive Yields',
-    description: 'Earn higher returns compared to traditional DeFi protocols with RWA-backed rates'
+    id: '3',
+    businessName: 'Timber Works Ltd',
+    sector: 'Forestry',
+    purpose: 'Expansion of logging operations',
+    loanAmount: 120000,
+    interestRate: 9.8,
+    tenor: 24,
+    creditRating: 'A',
+    icon: TreePine,
   },
   {
-    icon: Lock,
-    title: 'Risk Management',
-    description: 'Advanced risk scoring and diversification tools to protect your investments'
+    id: '4',
+    businessName: 'Sunrise Agriculture',
+    sector: 'Agriculture',
+    purpose: 'Purchase of raw materials',
+    loanAmount: 35000,
+    interestRate: 7.5,
+    tenor: 6,
+    creditRating: 'A',
+    icon: Sprout,
   },
   {
-    icon: Users,
-    title: 'Verified Borrowers',
-    description: 'All borrowers undergo KYC/AML verification and credit assessment'
+    id: '5',
+    businessName: 'Coastal Fisheries Inc',
+    sector: 'Fisheries',
+    purpose: 'Purchase of processing equipment',
+    loanAmount: 90000,
+    interestRate: 11.5,
+    tenor: 15,
+    creditRating: 'B',
+    icon: Fish,
+  },
+  {
+    id: '6',
+    businessName: 'Forest Products Co',
+    sector: 'Forestry',
+    purpose: 'Purchase of raw materials',
+    loanAmount: 65000,
+    interestRate: 12.8,
+    tenor: 12,
+    creditRating: 'C',
+    icon: TreePine,
   },
 ];
 
-const products = [
-  {
-    name: 'Standard Pool',
-    apy: '8-12%',
-    minSupply: '100 USDC',
-    lockPeriod: 'None',
-    riskLevel: 'Medium',
-    description: 'Diversified pool across multiple asset types with balanced risk-reward',
-    features: ['Auto-compounding', 'Flexible withdrawal', 'Daily settlements']
-  },
-  {
-    name: 'Premium Pool',
-    apy: '12-18%',
-    minSupply: '5,000 USDC',
-    lockPeriod: '90 days',
-    riskLevel: 'Medium-High',
-    description: 'Higher yields with curated premium assets and longer commitment',
-    features: ['Priority access', 'Premium assets only', 'Quarterly bonuses']
-  },
-  {
-    name: 'Conservative Pool',
-    apy: '5-8%',
-    minSupply: '50 USDC',
-    lockPeriod: 'None',
-    riskLevel: 'Low',
-    description: 'Lower risk pool focused on stable, high-quality RWA with proven track records',
-    features: ['Low volatility', 'Capital preservation', 'Instant withdrawal']
-  },
-];
+const getCreditRatingColor = (rating: string) => {
+  switch (rating) {
+    case 'A':
+      return 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400';
+    case 'B':
+      return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
+    case 'C':
+      return 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400';
+    default:
+      return 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400';
+  }
+};
 
 export default function ProductPage() {
+  const router = useRouter();
+
+  const handleCardClick = (loanId: string) => {
+    router.push(`/product/${loanId}`);
+  };
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -73,91 +105,70 @@ export default function ProductPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <TrendingUp className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl">RWA P2P Lending Products</CardTitle>
+          <CardTitle className="text-3xl">Borrower Loan Requests</CardTitle>
           <CardDescription className="text-base">
-            Choose the lending product that matches your investment goals and risk appetite
+            Browse available loan requests from verified borrowers and start lending
           </CardDescription>
         </CardHeader>
       </Card>
 
-      {/* Features Grid */}
+      {/* Loan Requests */}
       <div>
-        <h2 className="mb-4 text-2xl font-semibold">Why Choose Our Platform</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <Card key={feature.title}>
-              <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Products */}
-      <div>
-        <h2 className="mb-4 text-2xl font-semibold">Lending Pools</h2>
+        <h2 className="mb-4 text-2xl font-semibold">Available Loan Opportunities</h2>
         <Tabs defaultValue="all" className="w-full">
           <TabsList>
-            <TabsTrigger value="all">All Pools</TabsTrigger>
-            <TabsTrigger value="active">Active Positions</TabsTrigger>
+            <TabsTrigger value="all">All Loans</TabsTrigger>
+            <TabsTrigger value="agriculture">Agriculture</TabsTrigger>
+            <TabsTrigger value="fisheries">Fisheries</TabsTrigger>
+            <TabsTrigger value="forestry">Forestry</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
-                <Card key={product.name} className="flex flex-col">
+              {borrowerLoans.map((loan) => (
+                <Card
+                  key={loan.id}
+                  className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleCardClick(loan.id)}
+                >
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle>{product.name}</CardTitle>
-                      <Badge variant={
-                        product.riskLevel === 'Low' ? 'default' :
-                        product.riskLevel === 'Medium' ? 'secondary' :
-                        'destructive'
-                      }>
-                        {product.riskLevel}
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <loan.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <Badge className={getCreditRatingColor(loan.creditRating)}>
+                        Rating: {loan.creditRating}
                       </Badge>
                     </div>
-                    <CardDescription>{product.description}</CardDescription>
+                    <CardTitle className="text-lg">{loan.businessName}</CardTitle>
+                    <CardDescription>{loan.sector}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">APY Range</span>
-                        <span className="font-semibold text-green-600 dark:text-green-400">
-                          {product.apy}
+                        <span className="text-muted-foreground">Purpose</span>
+                        <span className="font-medium text-right text-xs">{loan.purpose}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Loan Amount</span>
+                        <span className="font-semibold">
+                          ${loan.loanAmount.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Min. Supply</span>
-                        <span className="font-medium">{product.minSupply}</span>
+                        <span className="text-muted-foreground">Interest Rate</span>
+                        <span className="font-semibold text-green-600 dark:text-green-400">
+                          {loan.interestRate}% p.a.
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Lock Period</span>
-                        <span className="font-medium">{product.lockPeriod}</span>
+                        <span className="text-muted-foreground">Tenor</span>
+                        <span className="font-medium">{loan.tenor} months</span>
                       </div>
-                    </div>
-
-                    <div className="space-y-2 border-t pt-4">
-                      <p className="text-sm font-medium">Features</p>
-                      <ul className="space-y-1">
-                        {product.features.map((feature) => (
-                          <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
 
                     <Button className="w-full" size="lg">
-                      Supply to Pool
+                      View Details
                     </Button>
                   </CardContent>
                 </Card>
@@ -165,19 +176,169 @@ export default function ProductPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="active" className="mt-6">
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-16">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                  <Users className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold">No Active Positions</h3>
-                <p className="mb-6 text-center text-sm text-muted-foreground">
-                  Connect your wallet and supply to a pool to start earning
-                </p>
-                <Button>Connect Wallet</Button>
-              </CardContent>
-            </Card>
+          <TabsContent value="agriculture" className="mt-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {borrowerLoans
+                .filter((loan) => loan.sector === 'Agriculture')
+                .map((loan) => (
+                  <Card
+                    key={loan.id}
+                    className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleCardClick(loan.id)}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                          <loan.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <Badge className={getCreditRatingColor(loan.creditRating)}>
+                          Rating: {loan.creditRating}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg">{loan.businessName}</CardTitle>
+                      <CardDescription>{loan.sector}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Purpose</span>
+                          <span className="font-medium text-right text-xs">{loan.purpose}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Loan Amount</span>
+                          <span className="font-semibold">
+                            ${loan.loanAmount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Interest Rate</span>
+                          <span className="font-semibold text-green-600 dark:text-green-400">
+                            {loan.interestRate}% p.a.
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Tenor</span>
+                          <span className="font-medium">{loan.tenor} months</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-full" size="lg">
+                        View Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="fisheries" className="mt-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {borrowerLoans
+                .filter((loan) => loan.sector === 'Fisheries')
+                .map((loan) => (
+                  <Card
+                    key={loan.id}
+                    className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleCardClick(loan.id)}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                          <loan.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <Badge className={getCreditRatingColor(loan.creditRating)}>
+                          Rating: {loan.creditRating}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg">{loan.businessName}</CardTitle>
+                      <CardDescription>{loan.sector}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Purpose</span>
+                          <span className="font-medium text-right text-xs">{loan.purpose}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Loan Amount</span>
+                          <span className="font-semibold">
+                            ${loan.loanAmount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Interest Rate</span>
+                          <span className="font-semibold text-green-600 dark:text-green-400">
+                            {loan.interestRate}% p.a.
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Tenor</span>
+                          <span className="font-medium">{loan.tenor} months</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-full" size="lg">
+                        View Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="forestry" className="mt-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {borrowerLoans
+                .filter((loan) => loan.sector === 'Forestry')
+                .map((loan) => (
+                  <Card
+                    key={loan.id}
+                    className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleCardClick(loan.id)}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                          <loan.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <Badge className={getCreditRatingColor(loan.creditRating)}>
+                          Rating: {loan.creditRating}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg">{loan.businessName}</CardTitle>
+                      <CardDescription>{loan.sector}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Purpose</span>
+                          <span className="font-medium text-right text-xs">{loan.purpose}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Loan Amount</span>
+                          <span className="font-semibold">
+                            ${loan.loanAmount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Interest Rate</span>
+                          <span className="font-semibold text-green-600 dark:text-green-400">
+                            {loan.interestRate}% p.a.
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Tenor</span>
+                          <span className="font-medium">{loan.tenor} months</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-full" size="lg">
+                        View Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
