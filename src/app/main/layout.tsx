@@ -1,6 +1,5 @@
 'use client';
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, History, Settings, ArrowLeftRight } from 'lucide-react';
@@ -63,7 +62,7 @@ export default function DashboardLayout({
               {navigation.find((item) => item.href === pathname)?.name || 'Dashboard'}
             </h2>
           </div>
-          <ConnectButton />
+          <appkit-button />
         </header>
 
         {/* Page Content */}
