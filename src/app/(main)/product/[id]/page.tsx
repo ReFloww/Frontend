@@ -18,8 +18,8 @@ const borrowerLoans = [
     sector: 'Agriculture',
     purpose: 'Purchase of fertilizers and seeds',
     loanAmount: 50000,
-    interestRate: 8.5,
-    tenor: 12,
+    interestRate: 10,
+    tenor: 10,
     creditRating: 'A',
     icon: Sprout,
   },
@@ -173,9 +173,9 @@ export default function LoanDetailPage() {
       <Button
         variant="ghost"
         onClick={() => router.push('/product')}
-        className="mb-4"
+        className="mb-4 hover:scale-105 transition-transform cursor-pointer"
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
+        <ArrowLeft className="mr-2 h-4 w-4 " />
         Back to Loans
       </Button>
 
@@ -291,7 +291,7 @@ export default function LoanDetailPage() {
               </div>
             </div>
 
-            <Button className="w-full" size="lg" disabled={!calculation}>
+            <Button className="w-full hover:scale-105 transition-transform cursor-pointer" size="lg" disabled={!calculation}>
               Proceed to Lend
             </Button>
           </CardContent>

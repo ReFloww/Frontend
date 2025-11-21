@@ -15,8 +15,8 @@ const borrowerLoans = [
     sector: 'Agriculture',
     purpose: 'Purchase of fertilizers and seeds',
     loanAmount: 50000,
-    interestRate: 8.5,
-    tenor: 12,
+    interestRate: 10,
+    tenor: 10,
     creditRating: 'A',
     icon: Sprout,
   },
@@ -114,9 +114,9 @@ export default function ProductPage() {
 
       {/* Loan Requests */}
       <div>
-        <h2 className="mb-4 text-2xl font-semibold">Available Loan Opportunities</h2>
+        <h2 className="mb-4 text-2xl font-semibold ">Available Opportunities</h2>
         <Tabs defaultValue="all" className="w-full">
-          <TabsList>
+          <TabsList >
             <TabsTrigger value="all">All Loans</TabsTrigger>
             <TabsTrigger value="agriculture">Agriculture</TabsTrigger>
             <TabsTrigger value="fisheries">Fisheries</TabsTrigger>
@@ -167,7 +167,7 @@ export default function ProductPage() {
                       </div>
                     </div>
 
-                    <Button className="w-full" size="lg">
+                    <Button className="w-full hover:scale-105 transition-transform cursor-pointer" size="lg">
                       View Details
                     </Button>
                   </CardContent>
