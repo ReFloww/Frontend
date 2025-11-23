@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Building2, Sprout, Fish, TreePine, Calculator } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import SwapCard from '@/components/market/swap-card';
 // Mock data (same as in product page)
 const borrowerLoans = [
     {
@@ -227,59 +228,11 @@ export default function LoanDetailPage() {
             {/* Two Cards Side by Side */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Left Card: Investment Input */}
-                <Card className="border-2">
-                    <CardHeader>
-                        <CardTitle>Investment Amount</CardTitle>
-                        <CardDescription>
-                            Enter the amount you want to lend
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="lending-amount" className="text-base font-semibold">
-                                    Your Investment
-                                </Label>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    Maximum: ${loan.loanAmount.toLocaleString()} RSF
-                                </p>
-                            </div>
-                            <Input
-                                id="lending-amount"
-                                type="number"
-                                placeholder="0.00"
-                                value={lendingAmount}
-                                onChange={(e) => handleAmountChange(e.target.value)}
-                                className="h-14 text-lg"
-                            />
-                        </div>
+                <SwapCard
+                    maxAmount={loan.loanAmount}
+                    onAmountChange={handleAmountChange}
+                />
 
-                        <Button className="w-full h-14 text-base" size="lg">
-                            Invest Now
-                        </Button>
-
-                        <div className="pt-4 border-t">
-                            <div className="space-y-3 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Interest Rate</span>
-                                    <span className="font-semibold text-green-600 dark:text-green-400">
-                                        {loan.interestRate}% p.a.
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Loan Tenor</span>
-                                    <span className="font-semibold">{loan.tenor} months</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Credit Rating</span>
-                                    <Badge className={getCreditRatingColor(loan.creditRating)}>
-                                        {loan.creditRating}
-                                    </Badge>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
                 {/* Right Card: Expected Returns */}
                 <Card className="border-2">
                     <CardHeader>
