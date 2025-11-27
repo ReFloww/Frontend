@@ -38,7 +38,7 @@ export default function DashboardLayout({
               height={40}
               className="rounded-full"
             />
-            <h1 className="text-xl font-bold">ReFlow</h1>
+            <h1 className="text-xl font-bold text-[#0A6A74]">ReFlow</h1>
           </div>
 
           {/* Navigation */}
@@ -56,7 +56,7 @@ export default function DashboardLayout({
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5 " />
                   {item.name}
                 </Link>
               );

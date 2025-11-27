@@ -103,7 +103,7 @@ export default function MarketPage() {
 
       {/* Loan Requests */}
       <div>
-        <h2 className="mb-1 text-2xl font-semibold ">Available Opportunities</h2>
+        <h2 className="mb-1 text-2xl font-semibold text-[#0A6A74]">Available Opportunities</h2>
         <Tabs defaultValue="all" className="w-full">
           <TabsContent value="all" className="mt-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +122,7 @@ export default function MarketPage() {
                         Rating: {loan.creditRating}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg">{loan.businessName}</CardTitle>
+                    <CardTitle className="text-lg text-[#0A6A74]">{loan.businessName}</CardTitle>
                     <CardDescription>{loan.sector}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-4">
@@ -158,7 +158,7 @@ export default function MarketPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="agriculture" className="mt-6">
+          {/* <TabsContent value="agriculture" className="mt-6">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {borrowerLoans
                 .filter((loan) => loan.sector === 'Agriculture')
@@ -321,7 +321,7 @@ export default function MarketPage() {
                   </Card>
                 ))}
             </div>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>

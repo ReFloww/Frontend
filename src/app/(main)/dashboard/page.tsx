@@ -83,7 +83,9 @@ export default function DashboardPage() {
             <div className="flex items-start justify-between">
               <div>
                 <CardDescription>Total Portfolio Value</CardDescription>
-                <CardTitle className="text-4xl mt-2">$245,000 RSF</CardTitle>
+                <CardTitle className="text-4xl mt-2 text-[#0A6A74]">
+                  $245,000 RSF
+                </CardTitle>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                 <Wallet className="h-6 w-6 text-primary" />
@@ -221,7 +223,7 @@ export default function DashboardPage() {
       {/* Second Row: Market Opportunities */}
       <Card className="border-2">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between text-[#0A6A74]">
             <div>
               <CardTitle>Market Opportunities</CardTitle>
               <CardDescription>Featured investment opportunities</CardDescription>
