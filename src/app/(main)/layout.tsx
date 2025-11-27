@@ -2,6 +2,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Wallet, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -29,8 +30,15 @@ export default function DashboardLayout({
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center border-b px-6">
-            <h1 className="text-xl font-bold">RWA Lending</h1>
+          <div className="flex h-16 items-center gap-3 border-b px-6">
+            <Image
+              src="/images/ReFloww.png"
+              alt="ReFlow Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <h1 className="text-xl font-bold">ReFlow</h1>
           </div>
 
           {/* Navigation */}

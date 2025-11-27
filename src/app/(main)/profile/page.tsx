@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, ShieldCheck, AlertCircle } from 'lucide-react';
@@ -42,10 +43,12 @@ export default function ProfilePage() {
               </li>
             </ul>
           </div>
-          <Button className="w-full hover:scale-105 transition-transform cursor-pointer">
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            Verify Now
-          </Button>
+          <Link href="/kyc" className="w-full">
+            <Button className="w-full hover:scale-101 transition-transform cursor-pointer">
+              <ShieldCheck className="h-4 w-4 mr-2" />
+              Verify Now
+            </Button>
+          </Link>
         </CardContent>
       </Card>
 
