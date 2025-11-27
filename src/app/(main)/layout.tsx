@@ -3,13 +3,14 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package } from 'lucide-react';
+import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Wallet, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Market', href: '/market', icon: TrendingUp },
+  { name: 'Wallet', href: '/wallet', icon: Wallet },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -64,7 +65,10 @@ export default function DashboardLayout({
               {navigation.find((item) => item.href === pathname)?.name || 'Dashboard'}
             </h2>
           </div>
-          <ConnectButton />
+          <div className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
+            <User className="h-5 w-5" />
+            <span className="text-sm font-medium">Profile</span>
+          </div>
         </header>
 
         {/* Page Content */}

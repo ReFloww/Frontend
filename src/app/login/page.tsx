@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from "next-auth/react";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,6 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - redirect to dashboard
     router.push('/dashboard');
   };
 
@@ -29,29 +29,31 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                required
-              />
+              <Input id="email" type="email" placeholder="name@example.com" required />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                required
-              />
+              <Input id="password" type="password" placeholder="Enter your password" required />
             </div>
+
             <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer">
               Login
             </Button>
+
+            {/* GOOGLE LOGIN */}
+            <Button
+              variant="outline"
+              className="w-full hover:scale-105 transition-transform cursor-pointer"
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            >
+              Login with Google
+            </Button>
           </form>
+
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-primary underline-offset-4 hover:underline ">
+            <Link href="/register" className="text-primary underline-offset-4 hover:underline">
               Register
             </Link>
           </div>
