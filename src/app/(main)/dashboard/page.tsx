@@ -70,9 +70,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+
+      {/* <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-      </div>
+      </div> */}
 
       {/* First Row: Portfolio Value and Performance */}
       <div className="grid gap-6 md:grid-cols-2">

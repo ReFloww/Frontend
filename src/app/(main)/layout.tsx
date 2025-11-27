@@ -13,6 +13,7 @@ const navigation = [
   { name: 'Wallet', href: '/wallet', icon: Wallet },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
+  // { name: 'Profile', href: '/profile', icon: User },
 ];
 
 export default function DashboardLayout({
@@ -62,13 +63,13 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
           <div className="flex items-center">
             <h2 className="text-lg font-semibold">
-              {navigation.find((item) => item.href === pathname)?.name || 'Dashboard'}
+              {navigation.find((item) => item.href === pathname)?.name || ''}
             </h2>
           </div>
-          <div className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
+          <Link href="/profile" className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
             <User className="h-5 w-5" />
             <span className="text-sm font-medium">Profile</span>
-          </div>
+          </Link>
         </header>
 
         {/* Page Content */}
