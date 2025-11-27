@@ -54,8 +54,8 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
               className={cn(
                 'cursor-pointer rounded-lg border-2 p-4 transition-colors',
                 formData.investorType === 'individual'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-muted hover:border-muted-foreground/50'
+                  ? 'border-[#00A864] bg-[#00A864]/5'
+                  : 'border-muted hover:border-[#006FD6]'
               )}
             >
               <div className="flex items-center gap-3">
@@ -63,12 +63,12 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
                   className={cn(
                     'h-5 w-5 rounded-full border-2 flex items-center justify-center',
                     formData.investorType === 'individual'
-                      ? 'border-primary'
+                      ? 'border-[#00A864]'
                       : 'border-muted-foreground/50'
                   )}
                 >
                   {formData.investorType === 'individual' && (
-                    <div className="h-3 w-3 rounded-full bg-primary" />
+                    <div className="h-3 w-3 rounded-full bg-[#00A864]" />
                   )}
                 </div>
                 <div>
@@ -85,8 +85,8 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
               className={cn(
                 'cursor-pointer rounded-lg border-2 p-4 transition-colors',
                 formData.investorType === 'organization'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-muted hover:border-muted-foreground/50'
+                  ? 'border-[#00A864] bg-[#00A864]/5'
+                  : 'border-muted hover:border-[#006FD6]'
               )}
             >
               <div className="flex items-center gap-3">
@@ -94,12 +94,12 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
                   className={cn(
                     'h-5 w-5 rounded-full border-2 flex items-center justify-center',
                     formData.investorType === 'organization'
-                      ? 'border-primary'
+                      ? 'border-[#00A864]'
                       : 'border-muted-foreground/50'
                   )}
                 >
                   {formData.investorType === 'organization' && (
-                    <div className="h-3 w-3 rounded-full bg-primary" />
+                    <div className="h-3 w-3 rounded-full bg-[#00A864]" />
                   )}
                 </div>
                 <div>
@@ -127,8 +127,8 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
                 className={cn(
                   'cursor-pointer rounded-lg border-2 p-3 transition-colors',
                   formData.purchaseAmount === option.value
-                    ? 'border-primary bg-primary/5'
-                    : 'border-muted hover:border-muted-foreground/50'
+                    ? 'border-[#00A864] bg-[#00A864]/5'
+                    : 'border-muted hover:border-[#006FD6]'
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -136,12 +136,12 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
                     className={cn(
                       'h-5 w-5 rounded-full border-2 flex items-center justify-center',
                       formData.purchaseAmount === option.value
-                        ? 'border-primary'
+                        ? 'border-[#00A864]'
                         : 'border-muted-foreground/50'
                     )}
                   >
                     {formData.purchaseAmount === option.value && (
-                      <div className="h-3 w-3 rounded-full bg-primary" />
+                      <div className="h-3 w-3 rounded-full bg-[#00A864]" />
                     )}
                   </div>
                   <span className="font-medium">{option.label}</span>
@@ -153,7 +153,7 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
 
         <Button
           onClick={onContinue}
-          className="w-full hover:scale-105 transition-transform cursor-pointer"
+          className="w-full bg-[#00A864] hover:bg-[#006FD6] hover:scale-105 transition-all cursor-pointer"
         >
           Continue
         </Button>

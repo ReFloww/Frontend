@@ -57,7 +57,7 @@ export function Step2Citizenship({ formData, onInputChange, onContinue, onBack }
           </Button>
           <Button
             onClick={onContinue}
-            className="flex-1 transition-all hover:scale-[1.02]"
+            className="flex-1 bg-[#00A864] hover:bg-[#006FD6] transition-all hover:scale-[1.02]"
           >
             Continue
           </Button>

@@ -149,7 +149,7 @@ export default function MarketPage() {
                       </div>
                     </div>
 
-                    <Button className="w-full hover:scale-105 transition-transform cursor-pointer" size="lg">
+                    <Button className="w-full hover:scale-105 transition-transform cursor-pointer bg-[#00A864] hover:bg-[#006FD6]" size="lg">
                       View Details
                     </Button>
                   </CardContent>

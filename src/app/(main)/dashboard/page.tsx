@@ -117,17 +117,20 @@ export default function DashboardPage() {
         </Card>
 
         {/* Performance Card with Chart */}
-        <Card className="border-2">
+        <Card className="border-2 bg-[#F1F7F3]">  {/* soft green background */}
           <CardHeader>
-            <CardDescription>Performance Overview</CardDescription>
-            <CardTitle className="text-2xl">Portfolio Growth</CardTitle>
+            <CardDescription className="text-[#475569]">Performance Overview</CardDescription>
+            <CardTitle className="text-2xl text-[#0F172A]">Portfolio Growth</CardTitle>
           </CardHeader>
+
           <CardContent>
             <div className="space-y-4">
-              {/* Line Chart with ups and downs */}
+
+              {/* Line Chart */}
               <div className="h-48 relative">
+
                 {/* Y-axis labels */}
-                <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-muted-foreground">
+                <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-[#475569]">
                   <span>${maxValue}</span>
                   <span>${Math.round(maxValue * 0.5)}</span>
                   <span>$0</span>
@@ -135,55 +138,56 @@ export default function DashboardPage() {
 
                 {/* Chart area */}
                 <div className="ml-12 h-full relative">
+
                   {/* Grid lines */}
                   <div className="absolute inset-0 flex flex-col justify-between">
-                    <div className="border-t border-muted"></div>
-                    <div className="border-t border-muted"></div>
-                    <div className="border-t border-muted"></div>
+                    <div className="border-t border-[#BBF7D0]" />
+                    <div className="border-t border-[#BBF7D0]" />
+                    <div className="border-t border-[#BBF7D0]" />
                   </div>
 
                   {/* SVG Line Chart */}
                   <svg className="w-full h-full" viewBox="0 0 300 100" preserveAspectRatio="none">
-                    {/* Area under the line */}
+                    {/* Gradient area fill */}
                     <defs>
-                      <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.0" />
+                      <linearGradient id="chartGreen" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor="#047857" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#047857" stopOpacity="0" />
                       </linearGradient>
                     </defs>
 
-                    {/* Area fill */}
+                    {/* Area Fill */}
                     <path
                       d={`M 0 ${100 - (performanceData[0].value / maxValue) * 100}
-                          L 60 ${100 - (performanceData[1].value / maxValue) * 100}
-                          L 120 ${100 - (performanceData[2].value / maxValue) * 100}
-                          L 180 ${100 - (performanceData[3].value / maxValue) * 100}
-                          L 240 ${100 - (performanceData[4].value / maxValue) * 100}
-                          L 300 ${100 - (performanceData[5].value / maxValue) * 100}
-                          L 300 100 L 0 100 Z`}
-                      fill="url(#chartGradient)"
+                  L 60 ${100 - (performanceData[1].value / maxValue) * 100}
+                  L 120 ${100 - (performanceData[2].value / maxValue) * 100}
+                  L 180 ${100 - (performanceData[3].value / maxValue) * 100}
+                  L 240 ${100 - (performanceData[4].value / maxValue) * 100}
+                  L 300 ${100 - (performanceData[5].value / maxValue) * 100}
+                  L 300 100 L 0 100 Z`}
+                      fill="url(#chartGreen)"
                     />
 
-                    {/* Line */}
+                    {/* Main Line */}
                     <polyline
-                      points={performanceData.map((data, index) =>
-                        `${(index * 60)},${100 - (data.value / maxValue) * 100}`
-                      ).join(' ')}
+                      points={performanceData
+                        .map((d, i) => `${i * 60},${100 - (d.value / maxValue) * 100}`)
+                        .join(" ")}
                       fill="none"
-                      stroke="hsl(var(--primary))"
+                      stroke="#047857"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
 
-                    {/* Data points */}
+                    {/* Points */}
                     {performanceData.map((data, index) => (
                       <circle
                         key={index}
                         cx={index * 60}
                         cy={100 - (data.value / maxValue) * 100}
                         r="3"
-                        fill="hsl(var(--primary))"
+                        fill="#047857"
                         className="hover:r-5 transition-all"
                       />
                     ))}
@@ -192,7 +196,7 @@ export default function DashboardPage() {
                   {/* X-axis labels */}
                   <div className="flex justify-between mt-2">
                     {performanceData.map((data, index) => (
-                      <span key={index} className="text-xs text-muted-foreground">
+                      <span key={index} className="text-xs text-[#475569]">
                         {data.month}
                       </span>
                     ))}
@@ -200,15 +204,18 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
+              {/* ROI Section */}
+              <div className="pt-4 border-t border-[#BBF7D0]">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Average ROI</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">10.2% p.a.</span>
+                  <span className="text-[#475569]">Average ROI</span>
+                  <span className="font-semibold text-[#16A34A]">10.2% p.a.</span>
                 </div>
               </div>
+
             </div>
           </CardContent>
         </Card>
+
       </div>
 
       {/* Second Row: Market Opportunities */}

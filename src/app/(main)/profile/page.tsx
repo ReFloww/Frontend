@@ -22,7 +22,7 @@ export default function ProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg bg-orange-50 dark:bg-orange-950/20 p-4">
+          <div className="rounded-lg bg-orange-100 dark:bg-orange-950/20 p-4">
             <h4 className="font-medium mb-2">Why verify your account?</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
@@ -43,8 +43,8 @@ export default function ProfilePage() {
               </li>
             </ul>
           </div>
-          <Link href="/kyc" className="w-full">
-            <Button className="w-full hover:scale-101 transition-transform cursor-pointer">
+          <Link href="/kyc" className="w-full  flex justify-center">
+            <Button className="w-1/4 hover:scale-101 transition-transform cursor-pointer bg-[#006FD6] hover:bg-[#00A864]" >
               <ShieldCheck className="h-4 w-4 mr-2" />
               Verify Now
             </Button>

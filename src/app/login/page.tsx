@@ -37,18 +37,23 @@ export default function LoginPage() {
               <Input id="password" type="password" placeholder="Enter your password" required />
             </div>
 
-            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer">
+            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer  bg-gradient-to-r from-[#0575E6] to-[#00B46D] 
+             hover:brightness-110">
               Login
             </Button>
 
             {/* GOOGLE LOGIN */}
             <Button
               variant="outline"
-              className="w-full hover:scale-105 transition-transform cursor-pointer"
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              className="w-full hover:scale-105 transition-transform cursor-pointer 
+             border-[#4285F4] text-[#4285F4]
+             hover:bg-[#4285F4]/10"
+              onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             >
               Login with Google
             </Button>
+
+
           </form>
 
           <div className="mt-4 text-center text-sm">

@@ -54,7 +54,7 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
               <p className="text-xs text-muted-foreground mb-4">
                 Position your face in the center
               </p>
-              <Button onClick={handleOpenCamera} className="mt-2">
+              <Button onClick={handleOpenCamera} className="mt-2 bg-[#00A864] hover:bg-[#006FD6]">
                 <Camera className="h-4 w-4 mr-2" />
                 Open Camera
               </Button>
@@ -65,22 +65,22 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
           </div>
 
           {/* Photo Requirements */}
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4">
+          <div className="rounded-lg bg-[#006FD6]/5 dark:bg-[#006FD6]/10 border border-[#006FD6]/30 p-4">
             <div className="flex items-start gap-2 mb-3">
-              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-              <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100">Please Note</h4>
+              <AlertCircle className="h-5 w-5 text-[#006FD6] mt-0.5 flex-shrink-0" />
+              <h4 className="font-semibold text-sm text-foreground">Please Note</h4>
             </div>
-            <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+            <ul className="space-y-2 text-sm text-foreground/90">
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+                <span className="text-[#006FD6] mt-0.5">•</span>
                 <span><strong>Maximum Brightness:</strong> Take pictures with maximum brightness</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+                <span className="text-[#006FD6] mt-0.5">•</span>
                 <span><strong>Background:</strong> Avoid crowded backgrounds</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+                <span className="text-[#006FD6] mt-0.5">•</span>
                 <span><strong>Clarity:</strong> Make sure the picture taken is clear and bright</span>
               </li>
             </ul>
@@ -97,7 +97,7 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
             </Button>
             <Button
               onClick={handleSubmit}
-              className="flex-1 transition-all hover:scale-[1.02]"
+              className="flex-1 bg-[#00A864] hover:bg-[#006FD6] transition-all hover:scale-[1.02]"
             >
               Submit
             </Button>
@@ -110,8 +110,8 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
+              <div className="h-16 w-16 rounded-full bg-[#00A864]/10 flex items-center justify-center">
+                <CheckCircle2 className="h-10 w-10 text-[#00A864]" />
               </div>
             </div>
             <DialogTitle className="text-center text-xl">
@@ -125,7 +125,7 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
           <div className="flex flex-col gap-3 mt-4">
             <Button
               onClick={handleGoToDashboard}
-              className="w-full hover:scale-105 transition-transform"
+              className="w-full bg-[#00A864] hover:bg-[#006FD6] hover:scale-105 transition-all"
             >
               Back to Dashboard
             </Button>

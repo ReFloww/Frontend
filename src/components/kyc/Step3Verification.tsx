@@ -94,7 +94,7 @@ export function Step3Verification({ onBack, onContinue }: Step3Props) {
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-lg border-2 border-dashed border-muted-foreground/30 p-12 text-center cursor-pointer hover:border-primary/50 transition-colors"
+              className="rounded-lg border-2 border-dashed border-muted-foreground/30 p-12 text-center cursor-pointer hover:border-[#006FD6] transition-colors"
             >
               <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
@@ -108,7 +108,7 @@ export function Step3Verification({ onBack, onContinue }: Step3Props) {
               />
             </div>
           ) : (
-            <div className="rounded-lg border-2 border-primary/20 p-4">
+            <div className="rounded-lg border-2 border-[#00A864]/20 p-4">
               <div className="flex items-start gap-4">
                 {previewUrl && (
                   <img
@@ -124,7 +124,7 @@ export function Step3Verification({ onBack, onContinue }: Step3Props) {
                       <p className="text-xs text-muted-foreground mt-1">
                         {(selectedFile.size / 1024).toFixed(2)} KB
                       </p>
-                      <div className="flex items-center gap-1 mt-2 text-green-600">
+                      <div className="flex items-center gap-1 mt-2 text-[#00A864]">
                         <CheckCircle className="h-4 w-4" />
                         <span className="text-xs font-medium">File uploaded successfully</span>
                       </div>
@@ -152,38 +152,38 @@ export function Step3Verification({ onBack, onContinue }: Step3Props) {
         </div>
 
         {/* Upload Requirements */}
-        <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4">
+        <div className="rounded-lg bg-[#006FD6]/5 dark:bg-[#006FD6]/10 border border-[#006FD6]/30 p-4">
           <div className="flex items-start gap-2 mb-3">
-            <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100">Please Note</h4>
+            <AlertCircle className="h-5 w-5 text-[#006FD6] mt-0.5 flex-shrink-0" />
+            <h4 className="font-semibold text-sm text-foreground">Please Note</h4>
           </div>
-          <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+          <ul className="space-y-2 text-sm text-foreground/90">
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>File Size:</strong> Maximum 2MB</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>Dimensions:</strong> Must be between 256x256px and 4096x4096px</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>File Format:</strong> Acceptable formats are JPG, JPEG, or PNG</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>Color Document:</strong> Only upload a colored image of your ID Card/KTP</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>Clarity:</strong> Ensure the document is clearly visible and easy to read</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>Proper Alignment:</strong> The ID Card/KTP photo should not be tilted or skewed</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
+              <span className="text-[#006FD6] mt-0.5">•</span>
               <span><strong>No Blemishes:</strong> Avoid images with light reflections, glare, or blemishes</span>
             </li>
           </ul>
@@ -201,7 +201,7 @@ export function Step3Verification({ onBack, onContinue }: Step3Props) {
           <Button
             onClick={onContinue}
             disabled={!selectedFile}
-            className="flex-1 transition-all hover:scale-[1.02]"
+            className="flex-1 bg-[#00A864] hover:bg-[#006FD6] transition-all hover:scale-[1.02]"
           >
             Continue
           </Button>

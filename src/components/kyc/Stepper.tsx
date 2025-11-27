@@ -22,9 +22,9 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 className={cn(
                   'flex h-10 w-10 items-center justify-center rounded-full border-2 font-semibold transition-colors',
                   currentStep > step.id
-                    ? 'border-primary bg-primary text-primary-foreground'
+                    ? 'border-[#00A864] bg-[#00A864] text-white'
                     : currentStep === step.id
-                    ? 'border-primary bg-primary text-primary-foreground'
+                    ? 'border-[#006FD6] bg-[#006FD6] text-white'
                     : 'border-muted-foreground/30 bg-background text-muted-foreground'
                 )}
               >
@@ -47,7 +47,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               <div
                 className={cn(
                   'h-0.5 w-20',
-                  currentStep > step.id ? 'bg-primary' : 'bg-muted-foreground/30'
+                  currentStep > step.id ? 'bg-[#00A864]' : 'bg-muted-foreground/30'
                 )}
               />
             )}

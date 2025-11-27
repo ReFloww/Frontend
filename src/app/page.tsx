@@ -14,9 +14,15 @@ export default function Home() {
           </p>
           <div className="pt-4 flex gap-4 justify-center">
             <Link href="/login">
-              <Button size="lg" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer 
+              bg-gradient-to-r from-[#0575E6] to-[#00B46D] 
+             hover:brightness-110 text-white"
+              >
                 Get Started
               </Button>
+
             </Link>
             {/* <Link href="/register">
               <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
