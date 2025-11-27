@@ -15,7 +15,7 @@ export default function Home() {
           <div className="pt-4 flex gap-4 justify-center">
             <Link href="/login">
               <Button size="lg" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
-                Start
+                Get Started
               </Button>
             </Link>
             {/* <Link href="/register">
