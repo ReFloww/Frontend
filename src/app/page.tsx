@@ -12,12 +12,23 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
             Supply liquidity to tokenized real-world assets.
           </p>
-          <div className="pt-4">
-            <Link href="/dashboard">
-              <Button size="lg" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
-                Launch App
+          <div className="pt-4 flex gap-4 justify-center">
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer 
+              bg-gradient-to-r from-[#0575E6] to-[#00B46D] 
+             hover:brightness-110 text-white"
+              >
+                Get Started
               </Button>
+
             </Link>
+            {/* <Link href="/register">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer">
+                Register
+              </Button>
+            </Link> */}
           </div>
         </div>
       </main>

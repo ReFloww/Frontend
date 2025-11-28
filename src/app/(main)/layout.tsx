@@ -2,15 +2,19 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, History, Settings, ArrowLeftRight } from 'lucide-react';
+import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Wallet, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Transactions', href: '/transactions', icon: ArrowLeftRight },
+  { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
+  { name: 'Market', href: '/market', icon: TrendingUp },
+  { name: 'Wallet', href: '/wallet', icon: Wallet },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
+  // { name: 'Profile', href: '/profile', icon: User },
 ];
 
 export default function DashboardLayout({
@@ -26,8 +30,15 @@ export default function DashboardLayout({
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center border-b px-6">
-            <h1 className="text-xl font-bold">RWA Lending</h1>
+          <div className="flex h-16 items-center gap-3 border-b px-6">
+            <Image
+              src="/images/ReFloww.png"
+              alt="ReFlow Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <h1 className="text-xl font-bold text-[#0A6A74]">ReFlow</h1>
           </div>
 
           {/* Navigation */}
@@ -41,11 +52,11 @@ export default function DashboardLayout({
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-gradient-to-r from-[#0575E6] to-[#00B46D]  text-primary-foreground'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5 " />
                   {item.name}
                 </Link>
               );
@@ -60,10 +71,13 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-6">
           <div className="flex items-center">
             <h2 className="text-lg font-semibold">
-              {navigation.find((item) => item.href === pathname)?.name || 'Dashboard'}
+              {navigation.find((item) => item.href === pathname)?.name || ''}
             </h2>
           </div>
-          <ConnectButton />
+          <Link href="/profile" className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
+            <User className="h-5 w-5" />
+            <span className="text-sm font-medium">Profile</span>
+          </Link>
         </header>
 
         {/* Page Content */}
