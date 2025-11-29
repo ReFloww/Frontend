@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ArrowDownUp, Info, TrendingUp, Percent, Coins } from 'lucide-react';
+import { Info, TrendingUp, Percent, Coins } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface SwapCardProps {
@@ -93,13 +93,13 @@ export default function SwapCard({ maxAmount = 1000000, onAmountChange }: SwapCa
                     <TabsContent value="buy" className="space-y-4 mt-4">
                         <div className="space-y-2">
                             <div className="flex justify-between items-center text-sm">
-                                <label className="text-muted-foreground">You invest</label>
-                                <span className="text-xs text-muted-foreground">Balance: 1,000 RSF</span>
+                                <label className="text-muted-foreground">Amount</label>
+                                <span className="text-xs text-muted-foreground">Max: {maxAmount.toLocaleString()} RSF</span>
                             </div>
                             <div className="relative">
                                 <Input
                                     type="number"
-                                    placeholder="0.0"
+                                    placeholder="Input amount"
                                     value={buyAmount}
                                     onChange={(e) => handleBuyAmountChange(e.target.value)}
                                     className="pr-16 h-14 text-lg"
@@ -110,35 +110,6 @@ export default function SwapCard({ maxAmount = 1000000, onAmountChange }: SwapCa
                                             <span className="text-xs font-bold">R</span>
                                         </div>
                                         <span className="font-semibold text-sm">RSF</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center -my-2">
-                            <div className="bg-muted rounded-full p-2 border-4 border-background">
-                                <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                                <label className="text-muted-foreground">You receive</label>
-                            </div>
-                            <div className="relative">
-                                <Input
-                                    type="number"
-                                    placeholder="0.0"
-                                    value={buyReceiveAmount}
-                                    readOnly
-                                    className="pr-16 h-14 text-lg bg-muted/50"
-                                />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                            <span className="text-xs font-bold">L</span>
-                                        </div>
-                                        <span className="font-semibold text-sm">LOAN</span>
                                     </div>
                                 </div>
                             </div>
@@ -183,8 +154,8 @@ export default function SwapCard({ maxAmount = 1000000, onAmountChange }: SwapCa
                             </>
                         )}
 
-                        <Button className="w-full h-12 text-base" size="lg">
-                            Invest RSF
+                        <Button className="w-full h-12 text-base bg-[#225B3A] hover:bg-[#1C4A30]" size="lg">
+                            Invest
                         </Button>
                     </TabsContent>
 
@@ -192,13 +163,13 @@ export default function SwapCard({ maxAmount = 1000000, onAmountChange }: SwapCa
                     <TabsContent value="sell" className="space-y-4 mt-4">
                         <div className="space-y-2">
                             <div className="flex justify-between items-center text-sm">
-                                <label className="text-muted-foreground">You redeem</label>
+                                <label className="text-muted-foreground">Amount</label>
                                 <span className="text-xs text-muted-foreground">Balance: 500 LOAN</span>
                             </div>
                             <div className="relative">
                                 <Input
                                     type="number"
-                                    placeholder="0.0"
+                                    placeholder="Input amount"
                                     value={sellAmount}
                                     onChange={(e) => handleSellAmountChange(e.target.value)}
                                     className="pr-16 h-14 text-lg"
@@ -209,35 +180,6 @@ export default function SwapCard({ maxAmount = 1000000, onAmountChange }: SwapCa
                                             <span className="text-xs font-bold">L</span>
                                         </div>
                                         <span className="font-semibold text-sm">LOAN</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center -my-2">
-                            <div className="bg-muted rounded-full p-2 border-4 border-background">
-                                <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                                <label className="text-muted-foreground">You receive</label>
-                            </div>
-                            <div className="relative">
-                                <Input
-                                    type="number"
-                                    placeholder="0.0"
-                                    value={sellReceiveAmount}
-                                    readOnly
-                                    className="pr-16 h-14 text-lg bg-muted/50"
-                                />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                                            <span className="text-xs font-bold">R</span>
-                                        </div>
-                                        <span className="font-semibold text-sm">RSF</span>
                                     </div>
                                 </div>
                             </div>

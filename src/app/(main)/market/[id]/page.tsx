@@ -18,6 +18,7 @@ const borrowerLoans = [
         sector: 'Agriculture',
         purpose: 'Purchase of fertilizers and seeds',
         loanAmount: 50000,
+        fundedAmount: 32000,
         interestRate: 10,
         tenor: 10,
         creditRating: 'A',
@@ -29,6 +30,7 @@ const borrowerLoans = [
         sector: 'Fisheries',
         purpose: 'Upgrade fishing equipment',
         loanAmount: 75000,
+        fundedAmount: 15000,
         interestRate: 10.2,
         tenor: 18,
         creditRating: 'B',
@@ -40,6 +42,7 @@ const borrowerLoans = [
         sector: 'Forestry',
         purpose: 'Expansion of logging operations',
         loanAmount: 120000,
+        fundedAmount: 90000,
         interestRate: 9.8,
         tenor: 24,
         creditRating: 'A',
@@ -51,6 +54,7 @@ const borrowerLoans = [
         sector: 'Agriculture',
         purpose: 'Purchase of raw materials',
         loanAmount: 35000,
+        fundedAmount: 5000,
         interestRate: 7.5,
         tenor: 6,
         creditRating: 'A',
@@ -62,6 +66,7 @@ const borrowerLoans = [
         sector: 'Fisheries',
         purpose: 'Purchase of processing equipment',
         loanAmount: 90000,
+        fundedAmount: 45000,
         interestRate: 11.5,
         tenor: 15,
         creditRating: 'B',
@@ -73,6 +78,7 @@ const borrowerLoans = [
         sector: 'Forestry',
         purpose: 'Purchase of raw materials',
         loanAmount: 65000,
+        fundedAmount: 60000,
         interestRate: 12.8,
         tenor: 12,
         creditRating: 'C',
@@ -109,8 +115,11 @@ export default function LoanDetailPage() {
     const [lendingAmount, setLendingAmount] = useState<string>('');
     const [calculation, setCalculation] = useState<LoanCalculation | null>(null);
 
+    // Calculate remaining amount available for lending
+    const remainingAmount = loan ? loan.loanAmount - loan.fundedAmount : 0;
+
     const calculateLoan = (amount: number) => {
-        if (!loan || amount <= 0 || amount > loan.loanAmount) {
+        if (!loan || amount <= 0 || amount > remainingAmount) {
             setCalculation(null);
             return;
         }
@@ -188,7 +197,7 @@ export default function LoanDetailPage() {
                                 <LoanIcon className="h-8 w-8 text-primary" />
                             </div>
                             <div>
-                                <CardTitle className="text-2xl">{loan.businessName}</CardTitle>
+                                <CardTitle className="text-2xl text-[#0A6A74]">{loan.businessName}</CardTitle>
                                 <CardDescription className="text-base">{loan.sector}</CardDescription>
                             </div>
                         </div>
@@ -222,6 +231,40 @@ export default function LoanDetailPage() {
                             </div>
                         </div>
                     </div>
+
+                    <Separator className="my-6" />
+
+                    {/* Funding Progress Bar */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium text-muted-foreground">Funding Progress</span>
+                            <span className="font-semibold text-[#0A6A74]">
+                                {((loan.fundedAmount / loan.loanAmount) * 100).toFixed(1)}% Funded
+                            </span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                            <div
+                                className="h-full bg-gradient-to-r from-[#0A6A74] to-[#16A34A] transition-all duration-500"
+                                style={{ width: `${(loan.fundedAmount / loan.loanAmount) * 100}%` }}
+                            />
+                        </div>
+
+                        {/* Funding Details */}
+                        <div className="flex items-center justify-between text-sm">
+                            <div>
+                                <span className="text-muted-foreground">Funded: </span>
+                                <span className="font-semibold">${loan.fundedAmount.toLocaleString()} RSF</span>
+                            </div>
+                            <div>
+                                <span className="text-muted-foreground">Remaining: </span>
+                                <span className="font-semibold text-green-600 dark:text-green-400">
+                                    ${(loan.loanAmount - loan.fundedAmount).toLocaleString()} RSF
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -229,7 +272,7 @@ export default function LoanDetailPage() {
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Left Card: Investment Input */}
                 <SwapCard
-                    maxAmount={loan.loanAmount}
+                    maxAmount={remainingAmount}
                     onAmountChange={handleAmountChange}
                 />
 

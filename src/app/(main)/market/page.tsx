@@ -15,6 +15,7 @@ const borrowerLoans = [
     sector: 'Agriculture',
     purpose: 'Purchase of fertilizers and seeds',
     loanAmount: 50000,
+    fundedAmount: 32000,
     interestRate: 10,
     tenor: 10,
     creditRating: 'A',
@@ -26,6 +27,7 @@ const borrowerLoans = [
     sector: 'Fisheries',
     purpose: 'Upgrade fishing equipment',
     loanAmount: 75000,
+    fundedAmount: 15000,
     interestRate: 10.2,
     tenor: 18,
     creditRating: 'B',
@@ -37,6 +39,7 @@ const borrowerLoans = [
     sector: 'Forestry',
     purpose: 'Expansion of logging operations',
     loanAmount: 120000,
+    fundedAmount: 90000,
     interestRate: 9.8,
     tenor: 24,
     creditRating: 'A',
@@ -48,6 +51,7 @@ const borrowerLoans = [
     sector: 'Agriculture',
     purpose: 'Purchase of raw materials',
     loanAmount: 35000,
+    fundedAmount: 5000,
     interestRate: 7.5,
     tenor: 6,
     creditRating: 'A',
@@ -59,6 +63,7 @@ const borrowerLoans = [
     sector: 'Fisheries',
     purpose: 'Purchase of processing equipment',
     loanAmount: 90000,
+    fundedAmount: 45000,
     interestRate: 11.5,
     tenor: 15,
     creditRating: 'B',
@@ -70,6 +75,7 @@ const borrowerLoans = [
     sector: 'Forestry',
     purpose: 'Purchase of raw materials',
     loanAmount: 65000,
+    fundedAmount: 60000,
     interestRate: 12.8,
     tenor: 12,
     creditRating: 'C',
@@ -149,7 +155,27 @@ export default function MarketPage() {
                       </div>
                     </div>
 
-                    <Button className="w-full hover:scale-105 transition-transform cursor-pointer bg-[#00A864] hover:bg-[#006FD6]" size="lg">
+                    {/* Funding Progress */}
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Funding Progress</span>
+                        <span className="font-semibold text-[#0A6A74]">
+                          {((loan.fundedAmount / loan.loanAmount) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#0A6A74] to-[#16A34A] transition-all duration-500"
+                          style={{ width: `${(loan.fundedAmount / loan.loanAmount) * 100}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>${loan.fundedAmount.toLocaleString()} funded</span>
+                        <span>${(loan.loanAmount - loan.fundedAmount).toLocaleString()} left</span>
+                      </div>
+                    </div>
+
+                    <Button className="w-full hover:scale-105 transition-transform cursor-pointer bg-[#225B3A] text-white hover:bg-[#1C4A30]" size="lg">
                       View Details
                     </Button>
                   </CardContent>
