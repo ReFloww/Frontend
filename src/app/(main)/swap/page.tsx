@@ -205,31 +205,26 @@ export default function SwapPage() {
               Choose from available tokens
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-3 p-4">
+          <div className="space-y-2">
             {availableTokens.map((token) => (
               <button
                 key={token.id}
                 onClick={() => handleTokenSelect(token, true)}
-                disabled={token.id === buyToken.id}
-                className={`
-                  flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
-                  ${token.id === sellToken.id
-                    ? 'border-[#225B3A] bg-[#225B3A]/10'
-                    : 'border-muted hover:border-[#225B3A]/50 hover:bg-muted/50'
-                  }
-                  ${token.id === buyToken.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                `}
+                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors border"
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: `${token.color}20` }}
                 >
                   <token.icon className="h-6 w-6" style={{ color: token.color }} />
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">{token.ticker}</div>
-                  <div className="text-xs text-muted-foreground">{token.name}</div>
+                <div className="flex-1 text-left">
+                  <div className="font-semibold">{token.ticker}</div>
+                  <div className="text-sm text-muted-foreground">{token.name}</div>
                 </div>
+                {sellToken.id === token.id && (
+                  <div className="w-2 h-2 rounded-full bg-[#225B3A]" />
+                )}
               </button>
             ))}
           </div>
@@ -245,31 +240,26 @@ export default function SwapPage() {
               Choose from available tokens
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-3 p-4">
+          <div className="space-y-2">
             {availableTokens.map((token) => (
               <button
                 key={token.id}
                 onClick={() => handleTokenSelect(token, false)}
-                disabled={token.id === sellToken.id}
-                className={`
-                  flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all
-                  ${token.id === buyToken.id
-                    ? 'border-[#225B3A] bg-[#225B3A]/10'
-                    : 'border-muted hover:border-[#225B3A]/50 hover:bg-muted/50'
-                  }
-                  ${token.id === sellToken.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                `}
+                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors border"
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: `${token.color}20` }}
                 >
                   <token.icon className="h-6 w-6" style={{ color: token.color }} />
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-sm">{token.ticker}</div>
-                  <div className="text-xs text-muted-foreground">{token.name}</div>
+                <div className="flex-1 text-left">
+                  <div className="font-semibold">{token.ticker}</div>
+                  <div className="text-sm text-muted-foreground">{token.name}</div>
                 </div>
+                {buyToken.id === token.id && (
+                  <div className="w-2 h-2 rounded-full bg-[#225B3A]" />
+                )}
               </button>
             ))}
           </div>
