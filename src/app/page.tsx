@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted">
       <main className="flex flex-col items-center justify-center text-center px-4">
-        <div className="space-y-6 max-w-3xl">
+        <div className="space-y-6 max-w-3xl text-[#0A6A74]">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
             The Future of RWA P2P Lending.
           </h1>
@@ -17,7 +17,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="text-lg px-8 py-6 hover:scale-105 transition-transform cursor-pointer 
-              bg-gradient-to-r from-[#0575E6] to-[#00B46D] 
+              bg-[#225B3A] text-white hover:bg-[#1C4A30]
              hover:brightness-110 text-white"
               >
                 Get Started

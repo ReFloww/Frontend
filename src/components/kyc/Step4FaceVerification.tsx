@@ -97,7 +97,7 @@ export function Step4FaceVerification({ onBack }: Step4Props) {
             </Button>
             <Button
               onClick={handleSubmit}
-              className="flex-1 bg-[#00A864] hover:bg-[#006FD6] transition-all hover:scale-[1.02]"
+              className="flex-1 bg-[#225B3A] text-white hover:bg-[#1C4A30] transition-all hover:scale-[1.02]"
             >
               Submit
             </Button>

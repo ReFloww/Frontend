@@ -153,7 +153,7 @@ export function Step1InvestmentProfile({ formData, onInputChange, onContinue }: 
 
         <Button
           onClick={onContinue}
-          className="w-full bg-[#00A864] hover:bg-[#006FD6] hover:scale-105 transition-all cursor-pointer"
+          className="w-full bg-[#225B3A] text-white hover:bg-[#1C4A30] hover:scale-105 transition-all cursor-pointer"
         >
           Continue
         </Button>

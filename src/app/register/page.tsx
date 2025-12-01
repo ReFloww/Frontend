@@ -63,7 +63,7 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer">
+            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer bg-[#225B3A] text-white hover:bg-[#1C4A30]">
               Register
             </Button>
           </form>

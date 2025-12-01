@@ -4,14 +4,14 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Wallet, User } from 'lucide-react';
+import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, ArrowLeftRight, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Market', href: '/market', icon: TrendingUp },
-  { name: 'Wallet', href: '/wallet', icon: Wallet },
+  { name: 'Swap', href: '/swap', icon: ArrowLeftRight },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
   // { name: 'Profile', href: '/profile', icon: User },
@@ -38,7 +38,7 @@ export default function DashboardLayout({
               height={40}
               className="rounded-full"
             />
-            <h1 className="text-xl font-bold text-[#0A6A74]">ReFlow</h1>
+            <h1 className="text-2xl font-bold text-[#225B3A]">ReFlow</h1>
           </div>
 
           {/* Navigation */}
@@ -52,13 +52,14 @@ export default function DashboardLayout({
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-gradient-to-r from-[#0575E6] to-[#00B46D]  text-primary-foreground'
+                      ? 'bg-[#225B3A] text-white shadow-sm hover:bg-[#1C4A30]'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <item.icon className="h-5 w-5 " />
+                  <item.icon className="h-5 w-5" />
                   {item.name}
                 </Link>
+
               );
             })}
           </nav>
@@ -74,10 +75,17 @@ export default function DashboardLayout({
               {navigation.find((item) => item.href === pathname)?.name || ''}
             </h2>
           </div>
-          <Link href="/profile" className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
-            <User className="h-5 w-5" />
-            <span className="text-sm font-medium">Profile</span>
-          </Link>
+
+          <div className="flex items-center gap-4">
+            {/* Connect Button on the Left */}
+            <ConnectButton />
+
+            {/* Profile Link on the Right */}
+            <Link href="/profile" className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
+              <User className="h-5 w-5" />
+              <span className="text-sm font-medium">Profile</span>
+            </Link>
+          </div>
         </header>
 
         {/* Page Content */}

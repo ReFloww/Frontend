@@ -37,7 +37,7 @@ export default function LoginPage() {
               <Input id="password" type="password" placeholder="Enter your password" required />
             </div>
 
-            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer  bg-gradient-to-r from-[#0575E6] to-[#00B46D] 
+            <Button type="submit" className="w-full hover:scale-105 transition-transform cursor-pointer  bg-[#225B3A] text-white hover:bg-[#1C4A30] 
              hover:brightness-110">
               Login
             </Button>
@@ -46,7 +46,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               className="w-full hover:scale-105 transition-transform cursor-pointer 
-             border-[#4285F4] text-[#4285F4]
+             border-[#225B3A] text-dark
              hover:bg-[#4285F4]/10"
               onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             >
