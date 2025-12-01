@@ -9,6 +9,9 @@ import { useRouter } from 'next/navigation';
 import { TokenizedProduct } from '@/types/product-market';
 
 // Mock data for tokenized product market
+// NOTE: All products share the SAME P2P token contract for testing
+const SHARED_P2P_ADDRESS = '0xBF9834d366B3073a962344a05805b913b1C6d858' as `0x${string}`;
+
 const productMarket: TokenizedProduct[] = [
   {
     id: '1',
@@ -21,6 +24,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 10,
     creditRate: 'A',
     contractId: 'contract-uuid-1',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: Sprout,
   },
   {
@@ -34,6 +38,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 18,
     creditRate: 'B',
     contractId: 'contract-uuid-2',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: Fish,
   },
   {
@@ -47,6 +52,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 24,
     creditRate: 'A',
     contractId: 'contract-uuid-3',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: TreePine,
   },
   {
@@ -60,6 +66,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 6,
     creditRate: 'A',
     contractId: 'contract-uuid-4',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: Sprout,
   },
   {
@@ -73,6 +80,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 15,
     creditRate: 'B',
     contractId: 'contract-uuid-5',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: Fish,
   },
   {
@@ -86,6 +94,7 @@ const productMarket: TokenizedProduct[] = [
     loanTenor: 12,
     creditRate: 'C',
     contractId: 'contract-uuid-6',
+    tokenP2PAddress: SHARED_P2P_ADDRESS,
     icon: TreePine,
   },
 ];
