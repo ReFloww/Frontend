@@ -128,7 +128,7 @@ export default function TradeCard({
 
     const calculateFee = (amount: string) => {
         const numValue = parseFloat(amount);
-        if (isNaN(numValue)) return 0;
+        if (isNaN(numValue)) return '0';
         return (numValue * platformFee / 100).toFixed(2);
     };
 

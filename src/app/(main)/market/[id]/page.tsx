@@ -42,7 +42,7 @@ const productMarket: TokenizedProduct[] = [
         loanTenor: 18,
         creditRate: 'B',
         contractId: 'contract-uuid-2',
-        tokenP2PAddress: SHARED_P2P_ADDRESS,
+        tokenP2PAddress: '0x4c7D3B35907592E80c9a3D1194798788BCb13cC8',
         icon: Fish,
     },
     {
