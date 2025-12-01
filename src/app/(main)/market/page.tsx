@@ -182,7 +182,7 @@ export default function MarketPage() {
                     </div>
 
                     <Button className="w-full hover:scale-105 transition-transform cursor-pointer bg-[#225B3A] text-white hover:bg-[#1C4A30]" size="lg">
-                      Trade {product.symbol}
+                      View Details
                     </Button>
                   </CardContent>
                 </Card>

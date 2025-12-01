@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Building2, Sprout, Fish, TreePine, Calculator } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import SwapCard from '@/components/market/swap-card';
+import TradeCard from '@/components/market/trade-card';
 import { TokenizedProduct } from '@/types/product-market';
 
 // Mock data for tokenized product market
@@ -264,7 +264,7 @@ export default function ProductDetailPage() {
             {/* Two Cards Side by Side */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Left Card: Investment Input */}
-                <SwapCard
+                <TradeCard
                     maxAmount={product.loanAmount}
                     onAmountChange={handleAmountChange}
                     symbol={product.symbol}
