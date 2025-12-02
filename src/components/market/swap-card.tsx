@@ -13,17 +13,25 @@ interface SwapCardProps {
     maxAmount?: number;
     onAmountChange?: (amount: string) => void;
     symbol?: string;
+    defaultTab?: 'invest' | 'redeem';
 }
 
 export default function SwapCard({
     maxAmount = 1000000,
     onAmountChange,
-    symbol = 'TOKEN'
+    symbol = 'TOKEN',
+    defaultTab = 'invest'
 }: SwapCardProps) {
+    const [activeTab, setActiveTab] = useState(defaultTab === 'redeem' ? 'sell' : 'buy');
     const [buyAmount, setBuyAmount] = useState('');
     const [buyReceiveAmount, setBuyReceiveAmount] = useState('');
     const [sellAmount, setSellAmount] = useState('');
     const [sellReceiveAmount, setSellReceiveAmount] = useState('');
+
+    // Update active tab when defaultTab prop changes
+    useEffect(() => {
+        setActiveTab(defaultTab === 'redeem' ? 'sell' : 'buy');
+    }, [defaultTab]);
 
     // Mock exchange rate and fees
     const platformFee = 0.5; // 0.5% platform fee
@@ -90,10 +98,10 @@ export default function SwapCard({
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="buy" className="w-full">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-2 ">
                         <TabsTrigger value="buy" className="cursor-pointer ">Invest</TabsTrigger>
-                        <TabsTrigger value="sell" className="cursor-pointer">Withdraw</TabsTrigger>
+                        <TabsTrigger value="sell" className="cursor-pointer">Redeem</TabsTrigger>
                     </TabsList>
 
                     {/* Buy Tab */}
@@ -163,7 +171,7 @@ export default function SwapCard({
                     <TabsContent value="sell" className="space-y-4 mt-4">
                         <div className="space-y-2">
                             <div className="flex justify-between items-center text-sm">
-                                <label className="text-muted-foreground">Withdrawal Amount</label>
+                                <label className="text-muted-foreground">Redeem Amount</label>
                                 <span className="text-xs text-muted-foreground">Invested: $500</span>
                             </div>
                             <div className="relative">
@@ -201,7 +209,7 @@ export default function SwapCard({
                                     <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                                         <Info className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                         <span className="text-xs text-amber-900 dark:text-amber-100">
-                                            Early withdrawal may affect your returns
+                                            Early redemption may affect your returns
                                         </span>
                                     </div>
                                 </div>
@@ -209,11 +217,11 @@ export default function SwapCard({
                         )}
 
                         <Button
-                            className="w-full h-12 text-base cursor-pointer hover:bg-red-600 hover:border-red-600 hover:text-white hover:brightness-90"
+                            className="w-full h-12 text-base cursor-pointer hover:bg-orange-500 hover:border-orange-500 hover:text-white hover:brightness-90"
                             size="lg"
                             variant="outline"
                         >
-                            Withdraw Funds
+                            Redeem Funds
                         </Button>
 
                     </TabsContent>

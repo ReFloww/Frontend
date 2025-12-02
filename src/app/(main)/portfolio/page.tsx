@@ -1,16 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sprout, Fish, TreePine, TrendingUp, TrendingDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sprout, Fish, TreePine, TrendingUp, TrendingDown, ArrowLeftRight, Wallet, PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import SwapDialog from '@/components/swap/swap-dialog';
 
 // Mock portfolio data
 const portfolioAssets = [
   {
     id: '1',
     asset: 'Green Valley Farms',
+    ticker: 'GVF',
     sector: 'Agriculture',
     value: 12500,
+    balance: 125,
     return: 8.5,
     status: 'active',
     icon: Sprout,
@@ -18,8 +24,10 @@ const portfolioAssets = [
   {
     id: '2',
     asset: 'Ocean Harvest Co.',
+    ticker: 'OHC',
     sector: 'Fisheries',
     value: 18000,
+    balance: 180,
     return: 12.3,
     status: 'active',
     icon: Fish,
@@ -27,8 +35,10 @@ const portfolioAssets = [
   {
     id: '3',
     asset: 'Timber Works Ltd',
+    ticker: 'TWL',
     sector: 'Forestry',
     value: 15500,
+    balance: 155,
     return: 9.7,
     status: 'active',
     icon: TreePine,
@@ -36,8 +46,10 @@ const portfolioAssets = [
   {
     id: '4',
     asset: 'Coastal Fisheries Inc.',
+    ticker: 'CFI',
     sector: 'Fisheries',
     value: 9800,
+    balance: 98,
     return: 7.2,
     status: 'active',
     icon: Fish,
@@ -45,8 +57,10 @@ const portfolioAssets = [
   {
     id: '5',
     asset: 'Highland Timber Co.',
+    ticker: 'HTC',
     sector: 'Forestry',
     value: 11200,
+    balance: 112,
     return: 10.8,
     status: 'active',
     icon: TreePine,
@@ -54,8 +68,10 @@ const portfolioAssets = [
   {
     id: '6',
     asset: 'Sunrise Agriculture',
+    ticker: 'SUN',
     sector: 'Agriculture',
     value: 8500,
+    balance: 85,
     return: 6.9,
     status: 'active',
     icon: Sprout,
@@ -63,8 +79,10 @@ const portfolioAssets = [
   {
     id: '7',
     asset: 'Pacific Seafood Ltd',
+    ticker: 'PSL',
     sector: 'Fisheries',
     value: 14200,
+    balance: 142,
     return: 11.4,
     status: 'active',
     icon: Fish,
@@ -72,8 +90,10 @@ const portfolioAssets = [
   {
     id: '8',
     asset: 'Valley Crops Farm',
+    ticker: 'VCF',
     sector: 'Agriculture',
     value: 10800,
+    balance: 108,
     return: 9.2,
     status: 'active',
     icon: Sprout,
@@ -94,8 +114,17 @@ const getSectorColor = (sector: string) => {
 };
 
 export default function PortfolioPage() {
+  const router = useRouter();
+  const [swapDialogOpen, setSwapDialogOpen] = useState(false);
+  const [selectedSwapToken, setSelectedSwapToken] = useState<string>('');
+
   const totalValue = portfolioAssets.reduce((sum, asset) => sum + asset.value, 0);
   const averageReturn = portfolioAssets.reduce((sum, asset) => sum + asset.return, 0) / portfolioAssets.length;
+
+  const handleSwapClick = (ticker: string) => {
+    setSelectedSwapToken(ticker);
+    setSwapDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -140,8 +169,10 @@ export default function PortfolioPage() {
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-semibold text-sm text-muted-foreground">Asset</th>
                   <th className="text-left py-3 px-4 font-semibold text-sm text-muted-foreground">Sector</th>
+                  <th className="text-right py-3 px-4 font-semibold text-sm text-muted-foreground">Balance</th>
                   <th className="text-right py-3 px-4 font-semibold text-sm text-muted-foreground">Value</th>
                   <th className="text-right py-3 px-4 font-semibold text-sm text-muted-foreground">Return</th>
+                  <th className="text-center py-3 px-4 font-semibold text-sm text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -166,6 +197,9 @@ export default function PortfolioPage() {
                         </Badge>
                       </td>
                       <td className="py-4 px-4 text-right">
+                        <span className="font-semibold">{asset.balance.toLocaleString()} Tokens</span>
+                      </td>
+                      <td className="py-4 px-4 text-right">
                         <span className="font-semibold">${asset.value.toLocaleString()} RSF</span>
                       </td>
                       <td className="py-4 px-4 text-right">
@@ -180,6 +214,37 @@ export default function PortfolioPage() {
                           </span>
                         </div>
                       </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-3 text-xs border-[#0A6A74] text-[#0A6A74] hover:bg-[#0A6A74] hover:text-white"
+                            onClick={() => handleSwapClick(asset.ticker)}
+                          >
+                            <ArrowLeftRight className="h-3 w-3 mr-1" />
+                            Swap
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-3 text-xs border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                            onClick={() => router.push(`/market/${asset.id}?tab=redeem`)}
+                          >
+                            <Wallet className="h-3 w-3 mr-1" />
+                            Redeem
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-3 text-xs border-[#225B3A] text-[#225B3A] hover:bg-[#225B3A] hover:text-white"
+                            onClick={() => router.push(`/market/${asset.id}?tab=invest`)}
+                          >
+                            <PlusCircle className="h-3 w-3 mr-1" />
+                            Invest
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -188,6 +253,13 @@ export default function PortfolioPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Swap Dialog */}
+      <SwapDialog
+        open={swapDialogOpen}
+        onOpenChange={setSwapDialogOpen}
+        defaultSellToken={selectedSwapToken}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -56,28 +57,44 @@ const getCreditRatingColor = (rating: string) => {
 export default function DashboardPage() {
   const router = useRouter();
 
-  // Mock asset distribution data
+  const [hoveredSector, setHoveredSector] = useState<string | null>(null);
+
+  // Mock asset distribution data with products
   const assetDistribution = [
     {
       sector: 'Agriculture',
       count: 3,
       value: 8500,
       color: '#16A34A',
-      icon: Sprout
+      icon: Sprout,
+      products: [
+        { name: 'Green Valley Farms', value: '$3,200' },
+        { name: 'Sunrise Agriculture', value: '$2,800' },
+        { name: 'Valley Crops Farm', value: '$2,500' },
+      ]
     },
     {
       sector: 'Fisheries',
       count: 3,
       value: 9800,
       color: '#0EA5E9',
-      icon: Fish
+      icon: Fish,
+      products: [
+        { name: 'Ocean Harvest Co.', value: '$4,100' },
+        { name: 'Coastal Fisheries Inc.', value: '$3,200' },
+        { name: 'Pacific Seafood Ltd', value: '$2,500' },
+      ]
     },
     {
       sector: 'Forestry',
       count: 2,
       value: 6216,
       color: '#8B5CF6',
-      icon: TreePine
+      icon: TreePine,
+      products: [
+        { name: 'Timber Works Ltd', value: '$3,500' },
+        { name: 'Highland Timber Co.', value: '$2,716' },
+      ]
     },
   ];
 
@@ -162,16 +179,59 @@ export default function DashboardPage() {
                         key={index}
                         d={createDonutSegment(asset.startAngle, asset.angle, 45, 28)}
                         fill={asset.color}
-                        className="transition-all hover:opacity-80"
+                        className="transition-all cursor-pointer"
+                        style={{
+                          opacity: hoveredSector === null || hoveredSector === asset.sector ? 1 : 0.4,
+                          transform: hoveredSector === asset.sector ? 'scale(1.05)' : 'scale(1)',
+                          transformOrigin: 'center',
+                        }}
+                        onMouseEnter={() => setHoveredSector(asset.sector)}
+                        onMouseLeave={() => setHoveredSector(null)}
                       />
                     ))}
                   </svg>
 
                   {/* Center text */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="text-3xl font-bold text-[#0A6A74]">{totalAssets}</div>
-                    <div className="text-xs text-muted-foreground">Assets</div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    {hoveredSector ? (
+                      <>
+                        <div className="text-2xl font-bold text-[#0A6A74]">
+                          {assetChartData.find(a => a.sector === hoveredSector)?.percentage.toFixed(0)}%
+                        </div>
+                        <div className="text-xs text-muted-foreground">{hoveredSector}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-3xl font-bold text-[#0A6A74]">{totalAssets}</div>
+                        <div className="text-xs text-muted-foreground">Assets</div>
+                      </>
+                    )}
                   </div>
+
+                  {/* Hover Tooltip */}
+                  {hoveredSector && (
+                    <div className="absolute -right-4 top-1/2 -translate-y-1/2 translate-x-full z-10">
+                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border p-3 min-w-[180px]">
+                        <div className="flex items-center gap-2 mb-2 pb-2 border-b">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: assetChartData.find(a => a.sector === hoveredSector)?.color }}
+                          />
+                          <span className="font-semibold text-sm">{hoveredSector}</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {assetChartData
+                            .find(a => a.sector === hoveredSector)
+                            ?.products.map((product, idx) => (
+                              <div key={idx} className="flex justify-between text-xs">
+                                <span className="text-muted-foreground truncate mr-2">{product.name}</span>
+                                <span className="font-medium">{product.value}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

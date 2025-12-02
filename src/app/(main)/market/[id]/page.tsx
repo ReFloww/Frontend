@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Building2, Sprout, Fish, TreePine, Calculator } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import SwapCard from '@/components/market/swap-card';
 import { TokenizedProduct } from '@/types/product-market';
@@ -117,7 +117,9 @@ interface LoanCalculation {
 export default function ProductDetailPage() {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
     const productId = params.id as string;
+    const tabParam = searchParams.get('tab') as 'invest' | 'redeem' | null;
 
     const product = productMarket.find((p) => p.id === productId);
     const [investmentAmount, setInvestmentAmount] = useState<string>('');
@@ -259,6 +261,7 @@ export default function ProductDetailPage() {
                     maxAmount={product.loanAmount}
                     onAmountChange={handleAmountChange}
                     symbol={product.symbol}
+                    defaultTab={tabParam || 'invest'}
                 />
 
                 {/* Right Card: Expected Returns */}
