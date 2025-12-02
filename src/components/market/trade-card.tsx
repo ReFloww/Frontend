@@ -6,8 +6,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { useTokenP2P } from '@/hooks/useTokenP2P';
-import BuyTab from './components/buytab';
-import SellTab from './components/selltab';
+import BuyTab from './_components/buytab';
+import SellTab from './_components/selltab';
 
 interface TradeCardProps {
     maxAmount?: number;
