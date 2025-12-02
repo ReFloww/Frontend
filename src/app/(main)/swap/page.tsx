@@ -11,51 +11,73 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeftRight, ArrowDownUp, ChevronDown, Sprout, Fish, TreePine } from 'lucide-react';
+import { ArrowDownUp, ChevronDown, DollarSign } from 'lucide-react';
+import { PRODUCT_MARKET } from '@/lib/constants/product-market';
+import { useSwapBalance } from '@/hooks/useSwapBalances';
 
-// Mock token data from market products
+// Map product colors by sector
+const getSectorColor = (sector: string) => {
+  switch (sector) {
+    case 'Agriculture':
+      return '#16A34A';
+    case 'Fisheries':
+      return '#0EA5E9';
+    case 'Forestry':
+      return '#8B5CF6';
+    default:
+      return '#0A6A74';
+  }
+};
+
+// Create available tokens from PRODUCT_MARKET + USDT
 const availableTokens = [
+  // USDT token
   {
-    id: '1',
-    ticker: 'GVF',
-    name: 'Green Valley Farms',
-    sector: 'Agriculture',
-    icon: Sprout,
-    color: '#16A34A',
-  },
-  {
-    id: '2',
-    ticker: 'OHC',
-    name: 'Ocean Harvest Co.',
-    sector: 'Fisheries',
-    icon: Fish,
-    color: '#0EA5E9',
-  },
-  {
-    id: '3',
-    ticker: 'TWL',
-    name: 'Timber Works Ltd',
-    sector: 'Forestry',
-    icon: TreePine,
-    color: '#8B5CF6',
-  },
-  {
-    id: '4',
-    ticker: 'RSF',
-    name: 'ReFlow Stable',
+    id: 'usdt',
+    ticker: 'USDT',
+    name: 'Tether USD',
     sector: 'Stablecoin',
-    icon: ArrowLeftRight,
-    color: '#0A6A74',
+    icon: DollarSign,
+    color: '#26A17B',
   },
+  // Map all products from PRODUCT_MARKET
+  ...PRODUCT_MARKET.map((product) => ({
+    id: product.id,
+    ticker: product.symbol,
+    name: product.productName,
+    sector: product.categoryId,
+    icon: product.icon,
+    color: getSectorColor(product.categoryId),
+  })),
 ];
 
 export default function SwapPage() {
   const [sellAmount, setSellAmount] = useState('');
   const [buyAmount, setBuyAmount] = useState('');
-  const [sellToken, setSellToken] = useState(availableTokens[3]); // Default RSF
-  const [buyToken, setBuyToken] = useState(availableTokens[0]); // Default GVF
+  const [sellToken, setSellToken] = useState(availableTokens[0]); // Default USDT
+  const [buyToken, setBuyToken] = useState(availableTokens[1]); // Default GVF
   const [isSelectingSell, setIsSelectingSell] = useState(false);
   const [isSelectingBuy, setIsSelectingBuy] = useState(false);
+
+  // Get token addresses for balance reading
+  const sellTokenAddress = sellToken.id === 'usdt'
+    ? undefined
+    : PRODUCT_MARKET.find(p => p.id === sellToken.id)?.tokenP2PAddress;
+
+  const buyTokenAddress = buyToken.id === 'usdt'
+    ? undefined
+    : PRODUCT_MARKET.find(p => p.id === buyToken.id)?.tokenP2PAddress;
+
+  // Read balances for selected tokens
+  const { balance: sellBalance, isConnected } = useSwapBalance({
+    tokenAddress: sellTokenAddress,
+    isUSDT: sellToken.id === 'usdt',
+  });
+
+  const { balance: buyBalance } = useSwapBalance({
+    tokenAddress: buyTokenAddress,
+    isUSDT: buyToken.id === 'usdt',
+  });
 
   const handleTokenSelect = (token: typeof availableTokens[0], isSell: boolean) => {
     if (isSell) {
@@ -101,21 +123,36 @@ export default function SwapPage() {
                 <div className="flex justify-between items-center mb-3">
                   <div className='flex flex-col items-start flex-1'>
                     <span className='text-sm text-muted-foreground mb-2'>Sell</span>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="0.00"
-                      value={sellAmount}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (/^\d*\.?\d*$/.test(value)) {
-                          setSellAmount(value);
-                        }
-                      }}
-                      className="pr-16 h-14 text-lg"
-                    />
+                    <div className="relative w-full">
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0.00"
+                        value={sellAmount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (/^\d*\.?\d*$/.test(value)) {
+                            setSellAmount(value);
+                          }
+                        }}
+                        className="pr-16 h-14 text-lg"
+                      />
+                      {isConnected && sellBalance > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSellAmount(sellBalance.toString())}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10"
+                        >
+                          MAX
+                        </Button>
+                      )}
+                    </div>
                     <span className="text-sm text-muted-foreground mt-2">
-                      Balance: 1,000 {sellToken.ticker}
+                      {isConnected
+                        ? `Balance: ${sellBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${sellToken.ticker}`
+                        : 'Connect wallet to see balance'}
                     </span>
                   </div>
                   <Button
@@ -164,7 +201,9 @@ export default function SwapPage() {
                       className="pr-16 h-14 text-lg"
                     />
                     <span className="text-sm text-muted-foreground mt-2">
-                      Balance: 0 {buyToken.ticker}
+                      {isConnected
+                        ? `Balance: ${buyBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${buyToken.ticker}`
+                        : 'Connect wallet to see balance'}
                     </span>
                   </div>
                   <Button
