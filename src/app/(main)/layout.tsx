@@ -4,14 +4,14 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, ArrowLeftRight, User } from 'lucide-react';
+import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Sparkles, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Market', href: '/market', icon: TrendingUp },
-  { name: 'Swap', href: '/swap', icon: ArrowLeftRight },
+  { name: 'Auto Manage', href: '/auto-manage', icon: Sparkles },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
   // { name: 'Profile', href: '/profile', icon: User },
