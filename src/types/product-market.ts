@@ -15,6 +15,7 @@ export interface TokenizedProduct {
   loanTenor: number; // Duration in months
   creditRate: 'A' | 'B' | 'C';
   contractId: string;
+  tokenP2PAddress: `0x${string}`; // TokenP2P contract address for this product
   icon: LucideIcon; // For UI display
 }
 

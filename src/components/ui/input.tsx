@@ -6,6 +6,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input
       type={type}
+      onWheel={(e) => (e.target as HTMLInputElement).blur()}
       data-slot="input"
       className={cn(
         "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-12 w-full min-w-0 rounded-lg border bg-transparent px-4 py-2 text-lg shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-9 file:border-0 file:bg-transparent file:text-base file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-base",
