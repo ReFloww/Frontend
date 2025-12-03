@@ -22,7 +22,7 @@ export default function TokenSelectorButton({ token, onClick }: TokenSelectorBut
     <Button
       variant="outline"
       onClick={onClick}
-      className="flex items-center gap-2 h-12 px-4 shrink-0 ml-3 rounded-xl hover:bg-muted/50 transition-all"
+      className="flex items-center gap-2 h-12 px-4 shrink-0 ml-3 rounded-xl hover:bg-muted/50 transition-all cursor-pointer"
     >
       <div
         className="w-7 h-7 rounded-full flex items-center justify-center"
