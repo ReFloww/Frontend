@@ -125,21 +125,21 @@ export default function PortfolioTable({
                           <Button
                             size="sm"
                             onClick={() => onInvest(asset.productId)}
-                            className="bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                            className="bg-green-600 hover:bg-green-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                           >
                             Invest
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => onSwap(asset.productId)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                           >
                             Swap
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => onSell(asset.productId)}
-                            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                           >
                             Sell
                           </Button>
