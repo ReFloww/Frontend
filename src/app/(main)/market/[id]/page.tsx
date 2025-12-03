@@ -2,110 +2,12 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Building2, Sprout, Fish, TreePine, Calculator } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import SwapCard from '@/components/market/swap-card';
-import { TokenizedProduct } from '@/types/product-market';
-
-// Mock data for tokenized product market
-const productMarket: TokenizedProduct[] = [
-    {
-        id: '1',
-        productName: 'Green Valley Farms',
-        symbol: 'GVF',
-        categoryId: 'Agriculture',
-        description: 'Purchase of fertilizers and seeds',
-        loanInterest: 10.00,
-        loanAmount: 50000.00,
-        loanTenor: 10,
-        creditRate: 'A',
-        contractId: 'contract-uuid-1',
-        icon: Sprout,
-    },
-    {
-        id: '2',
-        productName: 'Ocean Harvest Co.',
-        symbol: 'OHF',
-        categoryId: 'Fisheries',
-        description: 'Upgrade fishing equipment',
-        loanInterest: 10.20,
-        loanAmount: 75000.00,
-        loanTenor: 18,
-        creditRate: 'B',
-        contractId: 'contract-uuid-2',
-        icon: Fish,
-    },
-    {
-        id: '3',
-        productName: 'Timber Works Ltd',
-        symbol: 'TWL',
-        categoryId: 'Forestry',
-        description: 'Expansion of logging operations',
-        loanInterest: 9.80,
-        loanAmount: 120000.00,
-        loanTenor: 24,
-        creditRate: 'A',
-        contractId: 'contract-uuid-3',
-        icon: TreePine,
-    },
-    {
-        id: '4',
-        productName: 'Sunrise Agriculture',
-        symbol: 'SUN',
-        categoryId: 'Agriculture',
-        description: 'Purchase of raw materials',
-        loanInterest: 7.50,
-        loanAmount: 35000.00,
-        loanTenor: 6,
-        creditRate: 'A',
-        contractId: 'contract-uuid-4',
-        icon: Sprout,
-    },
-    {
-        id: '5',
-        productName: 'Coastal Fisheries Inc',
-        symbol: 'CFI',
-        categoryId: 'Fisheries',
-        description: 'Purchase of processing equipment',
-        loanInterest: 11.50,
-        loanAmount: 90000.00,
-        loanTenor: 15,
-        creditRate: 'B',
-        contractId: 'contract-uuid-5',
-        icon: Fish,
-    },
-    {
-        id: '6',
-        productName: 'Forest Products Co',
-        symbol: 'FPC',
-        categoryId: 'Forestry',
-        description: 'Purchase of raw materials',
-        loanInterest: 12.80,
-        loanAmount: 65000.00,
-        loanTenor: 12,
-        creditRate: 'C',
-        contractId: 'contract-uuid-6',
-        icon: TreePine,
-    },
-];
-
-const getCreditRatingColor = (rating: string) => {
-    switch (rating) {
-        case 'A':
-            return 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400';
-        case 'B':
-            return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
-        case 'C':
-            return 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400';
-        default:
-            return 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400';
-    }
-};
+import { ArrowLeft, Calculator } from 'lucide-react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import TradeCard from '@/components/market/trade-card';
+import { getProductById, getCreditRatingColor } from '@/lib/constants/product-market';
 
 interface LoanCalculation {
     monthlyPrincipal: number;
@@ -117,9 +19,13 @@ interface LoanCalculation {
 export default function ProductDetailPage() {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
     const productId = params.id as string;
 
-    const product = productMarket.find((p) => p.id === productId);
+    // Get the tab query parameter (default to 'buy' if not specified)
+    const defaultTab = searchParams.get('tab') === 'sell' ? 'sell' : 'buy';
+
+    const product = getProductById(productId);
     const [investmentAmount, setInvestmentAmount] = useState<string>('');
     const [calculation, setCalculation] = useState<LoanCalculation | null>(null);
 
@@ -229,7 +135,7 @@ export default function ProductDetailPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Contract ID</p>
-                                <p className="text-sm font-mono text-gray-500">{product.contractId}</p>
+                                <p className="text-sm font-mono text-gray-500">{product.tokenP2PAddress}</p>
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -255,20 +161,24 @@ export default function ProductDetailPage() {
             {/* Two Cards Side by Side */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Left Card: Investment Input */}
-                <SwapCard
+                <TradeCard
                     maxAmount={product.loanAmount}
                     onAmountChange={handleAmountChange}
                     symbol={product.symbol}
+                    tokenP2PAddress={product.tokenP2PAddress}
+                    defaultTab={defaultTab}
                 />
 
                 {/* Right Card: Expected Returns */}
-                <Card className="border-2">
+
+                {/* <Card className="border-2">
                     <CardHeader>
                         <CardTitle>Expected Returns from {product.symbol}</CardTitle>
                         <CardDescription>
                             {calculation ? 'Based on your investment amount' : 'Enter amount to see expected returns'}
                         </CardDescription>
                     </CardHeader>
+
                     <CardContent>
                         {calculation ? (
                             <div className="space-y-4">
@@ -314,8 +224,8 @@ export default function ProductDetailPage() {
                             </div>
                         )}
                     </CardContent>
-                </Card>
 
+                </Card> */}
 
             </div>
         </div>
