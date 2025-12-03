@@ -8,8 +8,8 @@ import { ArrowDownUp, DollarSign, Loader2, CheckCircle2 } from 'lucide-react';
 import { PRODUCT_MARKET } from '@/lib/constants/product-market';
 import { useSwapBalance } from '@/hooks/useSwapBalances';
 import { useSwapRouter } from '@/hooks/useSwapRouter';
-import TokenSelectorButton from './token-selector-button';
-import TokenSelectionDialog from './token-selection-dialog';
+import TokenSelectorButton from '@/components/swap/_components/token-selector-button';
+import TokenSelectionDialog from '@/components/swap/_components/token-selection-dialog';
 import { toast } from 'sonner';
 import { parseUnits, formatUnits } from 'viem';
 
@@ -60,6 +60,7 @@ export default function SwapCard() {
   const [isSelectingSell, setIsSelectingSell] = useState(false);
   const [isSelectingBuy, setIsSelectingBuy] = useState(false);
   const [step, setStep] = useState<'input' | 'approving' | 'swapping'>('input');
+  const [isApproving, setIsApproving] = useState(false);
 
   // Get token addresses for balance reading and swap operations
   const sellTokenAddress = (sellToken.id === 'usdt'
@@ -84,7 +85,7 @@ export default function SwapCard() {
   // Use SwapRouter hook
   const {
     allowance,
-    isApproving,
+    isApproving: isApprovingFromHook,
     isSwapping,
     approveToken,
     executeSwap,
@@ -108,23 +109,26 @@ export default function SwapCard() {
     },
   });
 
-  // Handle approval success
+  // Auto-proceed to swapping after approval succeeds
   useEffect(() => {
-    if (isApproveTxSuccess && step === 'approving') {
-      toast.success('Approval successful! You can now swap.');
-      setStep('input');
+    if (isApproveTxSuccess && isApproving) {
+      setIsApproving(false);
+      toast.success('Approval successful! Proceeding to swap...');
+      setStep('swapping');
       refetchAllowance();
+      // Automatically proceed to swapping
+      executeSwap(sellAmount);
     }
-  }, [isApproveTxSuccess, step, refetchAllowance]);
+  }, [isApproveTxSuccess, isApproving, sellAmount, executeSwap, refetchAllowance]);
 
   // Update step based on transaction states
   useEffect(() => {
-    if (isApproving && step !== 'approving') {
+    if (isApprovingFromHook && step !== 'approving') {
       setStep('approving');
     } else if (isSwapping && step !== 'swapping') {
       setStep('swapping');
     }
-  }, [isApproving, isSwapping, step]);
+  }, [isApprovingFromHook, isSwapping, step]);
 
 
   const handleTokenSelect = (token: { id: string; ticker: string; name: string; sector: string; icon: any; color: string }, isSell: boolean) => {
@@ -171,19 +175,21 @@ export default function SwapCard() {
       // Check if approval is needed
       if (allowance < amountInWei) {
         toast.info(`Requesting approval for ${sellToken.ticker}...`);
-        setStep('approving'); // Set step BEFORE calling approveToken
+        setIsApproving(true);
+        setStep('approving');
         await approveToken(sellAmount);
-        // After approval succeeds, the useEffect will handle resetting the step
+        // After approval succeeds, the useEffect will handle automatic swap
         return;
       }
 
       // Execute swap
       toast.info(`Swapping ${sellAmount} ${sellToken.ticker} for ${buyToken.ticker}...`);
-      setStep('swapping'); // Set step BEFORE calling executeSwap
+      setStep('swapping');
       await executeSwap(sellAmount);
     } catch (error: any) {
       console.error('Swap error:', error);
       setStep('input'); // Reset step on error
+      setIsApproving(false);
       const errorMessage = error?.message || 'Transaction failed';
 
       // Check for common errors
@@ -224,17 +230,19 @@ export default function SwapCard() {
     }
 
     if (parseFloat(sellAmount) > sellBalance) {
-      return { disabled: true, text: 'Insufficient Balance' };
+      return {
+        disabled: true, text: 'Insufficient Balance'
+      };
     }
 
-    // Show approving state when step is 'approving' OR isApproving is true
-    if (step === 'approving' || isApproving) {
+    // Show approving state when step is 'approving' OR isApprovingFromHook is true
+    if (step === 'approving' || isApprovingFromHook) {
       return { disabled: true, text: 'Approving...', showLoader: true };
     }
 
     // Show swapping state when step is 'swapping' OR isSwapping is true
     if (step === 'swapping' || isSwapping) {
-      return { disabled: true, text: 'Swapping...', showLoader: true };
+      return { disabled: false, text: 'Swapping...', showLoader: true };
     }
 
     const amountInWei = parseUnits(sellAmount, 6);
@@ -354,22 +362,22 @@ export default function SwapCard() {
           </Button>
 
           {/* Transaction Status */}
-          {((isApproving || isSwapping || isApproveTxSuccess || isSwapTxSuccess) && (approveTxHash || swapTxHash)) && (
+          {((isApprovingFromHook || isSwapping || isApproveTxSuccess || isSwapTxSuccess) && (approveTxHash || swapTxHash)) && (
             <div className="mt-4 p-4 rounded-lg bg-muted/50 border">
               <div className="flex items-start gap-3">
-                {(isApproving || isSwapping) ? (
+                {(isApprovingFromHook || isSwapping) ? (
                   <Loader2 className="h-5 w-5 animate-spin text-primary mt-0.5" />
                 ) : (
                   <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
                 )}
                 <div className="flex-1">
                   <p className="font-medium text-sm">
-                    {isApproving
+                    {isApprovingFromHook
                       ? `Approving ${sellToken.ticker}...`
                       : isSwapping
                         ? `Swapping ${sellToken.ticker} for ${buyToken.ticker}...`
-                        : isApproveTxSuccess && step === 'input'
-                          ? `${sellToken.ticker} Approved! You can now swap.`
+                        : isApproveTxSuccess && step === 'swapping'
+                          ? 'Approval successful! Swapping now...'
                           : isSwapTxSuccess
                             ? 'Swap Completed Successfully!'
                             : 'Processing...'}
