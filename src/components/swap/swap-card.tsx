@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowDownUp, DollarSign, Loader2 } from 'lucide-react';
+import { ArrowDownUp, DollarSign, Loader2, CheckCircle2 } from 'lucide-react';
 import { PRODUCT_MARKET } from '@/lib/constants/product-market';
 import { useSwapBalance } from '@/hooks/useSwapBalances';
 import { useSwapRouter } from '@/hooks/useSwapRouter';
@@ -59,6 +59,7 @@ export default function SwapCard() {
   const [buyToken, setBuyToken] = useState(availableTokens[1]); // Default GVF
   const [isSelectingSell, setIsSelectingSell] = useState(false);
   const [isSelectingBuy, setIsSelectingBuy] = useState(false);
+  const [step, setStep] = useState<'input' | 'approving' | 'swapping'>('input');
 
   // Get token addresses for balance reading and swap operations
   const sellTokenAddress = (sellToken.id === 'usdt'
@@ -82,27 +83,48 @@ export default function SwapCard() {
 
   // Use SwapRouter hook
   const {
-
     allowance,
     isApproving,
     isSwapping,
     approveToken,
     executeSwap,
     refetchAllowance,
+    isApproveTxSuccess,
+    isSwapTxSuccess,
+    approveTxHash,
+    swapTxHash,
   } = useSwapRouter({
     fromTokenAddress: sellTokenAddress,
     toTokenAddress: buyTokenAddress,
     onSuccess: () => {
       toast.success('Swap successful! 🎉');
-      setSellAmount('');
-      setBuyAmount('');
-      // Refetch balances after successful swap
       setTimeout(() => {
+        setStep('input');
+        setSellAmount('');
+        setBuyAmount('');
         refetchSellBalance();
         refetchBuyBalance();
-      }, 1000);
+      }, 2000);
     },
   });
+
+  // Handle approval success
+  useEffect(() => {
+    if (isApproveTxSuccess && step === 'approving') {
+      toast.success('Approval successful! You can now swap.');
+      setStep('input');
+      refetchAllowance();
+    }
+  }, [isApproveTxSuccess, step, refetchAllowance]);
+
+  // Update step based on transaction states
+  useEffect(() => {
+    if (isApproving && step !== 'approving') {
+      setStep('approving');
+    } else if (isSwapping && step !== 'swapping') {
+      setStep('swapping');
+    }
+  }, [isApproving, isSwapping, step]);
 
 
   const handleTokenSelect = (token: { id: string; ticker: string; name: string; sector: string; icon: any; color: string }, isSell: boolean) => {
@@ -149,15 +171,19 @@ export default function SwapCard() {
       // Check if approval is needed
       if (allowance < amountInWei) {
         toast.info(`Requesting approval for ${sellToken.ticker}...`);
+        setStep('approving'); // Set step BEFORE calling approveToken
         await approveToken(sellAmount);
-        return; // User needs to click swap again after approval
+        // After approval succeeds, the useEffect will handle resetting the step
+        return;
       }
 
       // Execute swap
       toast.info(`Swapping ${sellAmount} ${sellToken.ticker} for ${buyToken.ticker}...`);
+      setStep('swapping'); // Set step BEFORE calling executeSwap
       await executeSwap(sellAmount);
     } catch (error: any) {
       console.error('Swap error:', error);
+      setStep('input'); // Reset step on error
       const errorMessage = error?.message || 'Transaction failed';
 
       // Check for common errors
@@ -180,6 +206,13 @@ export default function SwapCard() {
     }
   }, [sellAmount]);
 
+  // Clear amounts when tokens are changed
+  useEffect(() => {
+    setSellAmount('');
+    setBuyAmount('');
+    setStep('input'); // Reset step when changing tokens
+  }, [sellToken.id, buyToken.id]);
+
   // Determine button state and text
   const getButtonState = () => {
     if (!isConnected) {
@@ -194,11 +227,13 @@ export default function SwapCard() {
       return { disabled: true, text: 'Insufficient Balance' };
     }
 
-    if (isApproving) {
+    // Show approving state when step is 'approving' OR isApproving is true
+    if (step === 'approving' || isApproving) {
       return { disabled: true, text: 'Approving...', showLoader: true };
     }
 
-    if (isSwapping) {
+    // Show swapping state when step is 'swapping' OR isSwapping is true
+    if (step === 'swapping' || isSwapping) {
       return { disabled: true, text: 'Swapping...', showLoader: true };
     }
 
@@ -241,7 +276,11 @@ export default function SwapCard() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => setSellAmount(sellBalance.toString())}
+                        onClick={() => {
+                          // Format balance to 6 decimals and remove trailing zeros
+                          const formattedBalance = sellBalance.toFixed(6).replace(/\.?0+$/, '');
+                          setSellAmount(formattedBalance);
+                        }}
                         className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10"
                       >
                         MAX
@@ -306,13 +345,55 @@ export default function SwapCard() {
 
           {/* Swap Action Button */}
           <Button
-            className="w-full h-14 text-lg font-semibold bg-[#225B3A] hover:bg-[#1C4A30] mt-6 rounded-xl transition-all cursor-pointer hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 text-lg font-semibold bg-[#225B3A] hover:bg-[#1C4A30] mt-6 rounded-xl transition-all cursor-pointer hover:shadow-lg hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleSwap}
             disabled={buttonState.disabled}
           >
             {buttonState.showLoader && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
             {buttonState.text}
           </Button>
+
+          {/* Transaction Status */}
+          {((isApproving || isSwapping || isApproveTxSuccess || isSwapTxSuccess) && (approveTxHash || swapTxHash)) && (
+            <div className="mt-4 p-4 rounded-lg bg-muted/50 border">
+              <div className="flex items-start gap-3">
+                {(isApproving || isSwapping) ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-primary mt-0.5" />
+                ) : (
+                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  <p className="font-medium text-sm">
+                    {isApproving
+                      ? `Approving ${sellToken.ticker}...`
+                      : isSwapping
+                        ? `Swapping ${sellToken.ticker} for ${buyToken.ticker}...`
+                        : isApproveTxSuccess && step === 'input'
+                          ? `${sellToken.ticker} Approved! You can now swap.`
+                          : isSwapTxSuccess
+                            ? 'Swap Completed Successfully!'
+                            : 'Processing...'}
+                  </p>
+                  {(approveTxHash || swapTxHash) && (
+                    <>
+                      <p className="text-xs text-muted-foreground mt-1 break-all">
+                        Tx: {(swapTxHash || approveTxHash)?.slice(0, 10)}...{(swapTxHash || approveTxHash)?.slice(-8)}
+                      </p>
+                      <a
+                        href={`https://sepolia.mantlescan.xyz/tx/${swapTxHash || approveTxHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline mt-1 inline-block"
+                      >
+                        View on Explorer →
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </CardContent>
       </Card>
 
