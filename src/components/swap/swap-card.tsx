@@ -119,7 +119,6 @@ export default function SwapCard({ initialSellTokenId }: SwapCardProps) {
     if (isSwapTxError) {
       setStep('input');
       toast.error('Swap transaction failed. Please try again.');
-      // Note: amounts are NOT cleared here so user can retry with same values
     }
   }, [isSwapTxError]);
 
@@ -215,10 +214,18 @@ export default function SwapCard({ initialSellTokenId }: SwapCardProps) {
     if (!sellToken || !buyToken) {
       return { disabled: true, text: 'Select Tokens' };
     }
-    // Show swapping state only when actively swapping and not yet completed/failed
+
+    // condition bug state
+    // Kondisi 1: Swap Error (prioritas tertinggi)
+    if ((step === 'swapping' || isSwapping) && isSwapTxError) {
+      return { disabled: false, text: 'ulang', showLoader: false };
+    }
+
+    // Kondisi 2: Swap sedang berlangsung (belum sukses & tidak error)
     if ((step === 'swapping' || isSwapping) && !isSwapTxSuccess && !isSwapTxError) {
       return { disabled: true, text: 'Swapping...', showLoader: true };
     }
+
 
     return { disabled: false, text: 'Swap' };
   };
