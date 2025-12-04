@@ -22,8 +22,8 @@ export default function PortfolioPage() {
   };
 
   const handleSwap = (productId: string) => {
-    // Navigate to swap page
-    router.push('/swap');
+    // Navigate to swap page with pre-selected token
+    router.push(`/swap?sellToken=${productId}`);
   };
 
   const handleSell = (productId: string) => {

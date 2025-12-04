@@ -182,6 +182,8 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
     isConnected,
     isApproveTxSuccess,
     isSwapTxSuccess,
+    isApproveTxError,
+    isSwapTxError,
 
     // Functions
     approveToken,
