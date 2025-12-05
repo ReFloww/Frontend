@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet } from 'lucide-react';
+import { Wallet, Landmark, Users } from 'lucide-react';
 import { usePortfolioBalances } from '@/hooks/usePortfolioBalances';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import PortfolioTable from '@/components/portfolio/portofoliotable';
 import SwapDialog from '@/components/swap/swap-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function PortfolioPage() {
   const router = useRouter();
@@ -21,22 +22,18 @@ export default function PortfolioPage() {
   const totalPortfolioValue = usdtBalance + totalValue;
 
   const handleInvest = (productId: string) => {
-    // Navigate to market detail page with buy tab active
+    // Navigate to market detail page with invest/buy tab active
     router.push(`/market/${productId}?tab=buy`);
   };
 
-  const handleSwap = (productId: string, ticker?: string) => {
+  const handleSwap = (productId: string, symbol: string) => {
     // Open swap dialog with the token
-    if (ticker) {
-      setSelectedSwapToken(ticker);
-      setSwapDialogOpen(true);
-    } else {
-      router.push('/auto-manage');
-    }
+    setSelectedSwapToken(symbol);
+    setSwapDialogOpen(true);
   };
 
   const handleSell = (productId: string) => {
-    // Navigate to market detail page with sell tab active
+    // Navigate to market detail page with redeem/sell tab active
     router.push(`/market/${productId}?tab=sell`);
   };
 
@@ -116,15 +113,56 @@ export default function PortfolioPage() {
         </Card>
       </div>
 
-      {/* Portfolio Table */}
-      <PortfolioTable
-        activeAssets={activeAssets}
-        isLoading={isLoading}
-        isConnected={isConnected}
-        onInvest={handleInvest}
-        onSwap={handleSwap}
-        onSell={handleSell}
-      />
+      {/* Portfolio Tabs */}
+      <Tabs defaultValue="p2p-lending" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="p2p-lending" className="flex items-center gap-2">
+            <Landmark className="h-4 w-4" />
+            P2P Lending
+          </TabsTrigger>
+          <TabsTrigger value="manager-investment" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Manager Investment
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="p2p-lending" className="mt-6">
+          <PortfolioTable
+            activeAssets={activeAssets}
+            isLoading={isLoading}
+            isConnected={isConnected}
+            onInvest={handleInvest}
+            onSwap={handleSwap}
+            onSell={handleSell}
+          />
+        </TabsContent>
+
+        <TabsContent value="manager-investment" className="mt-6">
+          <Card className="border-2">
+            <CardHeader>
+              <CardTitle>Manager Investment</CardTitle>
+              <CardDescription>
+                {isConnected
+                  ? 'View your investments managed by investment managers'
+                  : 'Connect your wallet to view your managed investments'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium text-muted-foreground">
+                  {isConnected ? 'No managed investments found' : 'Connect your wallet to view investments'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {isConnected
+                    ? 'Invest with professional managers to diversify your portfolio'
+                    : 'Your managed investments will appear here once connected'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Swap Dialog */}
       <SwapDialog
