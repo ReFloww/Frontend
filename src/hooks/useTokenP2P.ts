@@ -10,6 +10,12 @@ interface UseTokenP2PProps {
     tokenP2PAddress: `0x${string}`;
 }
 
+/**
+ * Hook for interacting with TokenP2P contracts
+ * Each product has its own unique P2P token contract
+ *
+ * @param tokenP2PAddress - The unique contract address for the specific P2P token
+ */
 export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
     const { address: userAddress, isConnected } = useAccount();
     const { writeContract, data: hash, isPending, error } = useWriteContract();
@@ -17,7 +23,7 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
         hash,
     });
 
-    // Read P2P token balance
+    // Read P2P token balance for the SPECIFIC tokenP2PAddress
     const { data: p2pBalance, refetch: refetchP2pBalance } = useReadContract({
         address: tokenP2PAddress,
         abi: tokenP2PAbi,
@@ -41,7 +47,8 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
         },
     });
 
-    // Read USDT allowance for TokenP2P contract
+    // Read USDT allowance for the SPECIFIC TokenP2P contract address
+    // This ensures approval is specific to each product's P2P token contract
     const { data: allowance, refetch: refetchAllowance } = useReadContract({
         address: USDT_ADDRESS,
         abi: mockUsdtAbi,
@@ -76,21 +83,23 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
         }
     }, [isSuccess, refetchP2pBalance, refetchUsdtBalance, refetchAllowance]);
 
-    // Write functions
+    // Write functions - all use the SPECIFIC tokenP2PAddress
     const approveUSDT = (amount: string) => {
         const amountInWei = parseUnits(amount, 6);
+        // Approve USDT spending for the SPECIFIC P2P token contract
         writeContract({
             address: USDT_ADDRESS,
             abi: mockUsdtAbi,
             functionName: 'approve',
-            args: [tokenP2PAddress, amountInWei],
+            args: [tokenP2PAddress, amountInWei], // Uses the specific contract address
         });
     };
 
     const buyTokens = (amount: string) => {
         const amountInWei = parseUnits(amount, 6);
+        // Buy tokens from the SPECIFIC P2P token contract
         writeContract({
-            address: tokenP2PAddress,
+            address: tokenP2PAddress, // Uses the specific contract address
             abi: tokenP2PAbi,
             functionName: 'buyTokens',
             args: [amountInWei],
@@ -99,8 +108,9 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
 
     const sellTokens = (amount: string) => {
         const amountInWei = parseUnits(amount, 6);
+        // Sell tokens to the SPECIFIC P2P token contract
         writeContract({
-            address: tokenP2PAddress,
+            address: tokenP2PAddress, // Uses the specific contract address
             abi: tokenP2PAbi,
             functionName: 'sellTokens',
             args: [amountInWei],

@@ -1,8 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ReFlow Frontend
+
+ReFlow is a decentralized P2P lending platform for Real World Assets (RWA) built on Mantle Network. This frontend allows users to invest in tokenized agricultural, fisheries, and forestry assets.
+
+## Features
+
+- **Dashboard** - Overview of portfolio performance and asset distribution
+- **Portfolio** - Track and manage your investments with real wallet integration
+- **Market** - Browse and invest in tokenized RWA products
+- **Auto Manage** - Let professional managers handle your portfolio automatically
+- **History** - View transaction history
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS 4
+- **UI Components**: Radix UI + shadcn/ui
+- **Web3**: RainbowKit, Wagmi, Viem
+- **State Management**: TanStack Query
+
+## Prerequisites
+
+- Node.js 18+
+- npm or yarn or pnpm
+- A Web3 wallet (MetaMask, etc.)
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ReFloww/Frontend.git
+cd Frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### 3. Set up environment variables
+
+Create a `.env` file in the root directory:
+
+```env
+# WalletConnect Project ID
+# Get yours at https://cloud.walletconnect.com
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+
+# USDT Contract Address (Mantle Sepolia Testnet)
+NEXT_PUBLIC_USDT_ADDRESS=0xe01c5464816a544d4d0d6a336032578bd4629F10
+```
+
+#### Environment Variables Explained
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Project ID from WalletConnect Cloud for wallet connection functionality. Get one for free at [cloud.walletconnect.com](https://cloud.walletconnect.com) | Yes |
+| `NEXT_PUBLIC_USDT_ADDRESS` | The USDT token contract address on Mantle Sepolia testnet. Used for investment transactions. | Yes |
+
+### 4. Run the development server
 
 ```bash
 npm run dev
@@ -10,27 +71,66 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run on a different port:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev -- -p 3001
+```
 
-## Learn More
+## Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── (main)/            # Main app layout (with sidebar)
+│   │   ├── dashboard/     # Dashboard page
+│   │   ├── portfolio/     # Portfolio page
+│   │   ├── market/        # Market listing & detail pages
+│   │   ├── auto-manage/   # Auto-manage & manager detail pages
+│   │   ├── history/       # Transaction history
+│   │   └── settings/      # User settings
+│   └── login/             # Authentication pages
+├── components/            # Reusable React components
+│   ├── ui/               # shadcn/ui components
+│   ├── market/           # Market-specific components
+│   ├── portfolio/        # Portfolio-specific components
+│   └── swap/             # Swap dialog component
+├── hooks/                # Custom React hooks
+├── lib/                  # Utilities and constants
+│   ├── abis/            # Smart contract ABIs
+│   ├── constants/       # App constants
+│   └── utils.ts         # Helper functions
+└── types/               # TypeScript type definitions
+```
 
-## Deploy on Vercel
+## Network Configuration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app is configured to work with **Mantle Sepolia Testnet**. Make sure your wallet is connected to the correct network:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Network Name**: Mantle Sepolia Testnet
+- **RPC URL**: https://rpc.sepolia.mantle.xyz
+- **Chain ID**: 5003
+- **Currency Symbol**: MNT
+
+## Contributing
+
+1. Create a new branch from `main`
+2. Make your changes
+3. Submit a pull request
+
+## License
+
+MIT

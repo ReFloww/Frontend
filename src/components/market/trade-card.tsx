@@ -6,14 +6,17 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { useTokenP2P } from '@/hooks/useTokenP2P';
-import BuyTab from './components/buytab';
-import SellTab from './components/selltab';
+import BuyTab from './_components/buytab';
+import SellTab from './_components/selltab';
 
 interface TradeCardProps {
     maxAmount?: number;
     onAmountChange?: (amount: string) => void;
     symbol?: string;
+    /** The unique P2P token contract address for this specific product */
     tokenP2PAddress: `0x${string}`;
+    /** Default tab to show ('buy' or 'sell') */
+    defaultTab?: 'buy' | 'sell';
 }
 
 export default function TradeCard({
@@ -21,6 +24,7 @@ export default function TradeCard({
     onAmountChange,
     symbol = 'TOKEN',
     tokenP2PAddress,
+    defaultTab = 'buy',
 }: TradeCardProps) {
     const [buyAmount, setBuyAmount] = useState('');
     const [buyReceiveAmount, setBuyReceiveAmount] = useState('');
@@ -30,7 +34,8 @@ export default function TradeCard({
     const [actionType, setActionType] = useState<'mint' | 'burn'>('mint');
     const [isApproving, setIsApproving] = useState(false);
 
-    // Use the TokenP2P hook
+    // Use the TokenP2P hook with the SPECIFIC product's P2P token contract address
+    // Each product has its own unique contract, so balances and interactions are product-specific
     const {
         usdtBalance,
         p2pBalance,
@@ -128,11 +133,11 @@ export default function TradeCard({
 
     const calculateFee = (amount: string) => {
         const numValue = parseFloat(amount);
-        if (isNaN(numValue)) return 0;
+        if (isNaN(numValue)) return '0';
         return (numValue * platformFee / 100).toFixed(2);
     };
 
-    // Balance validation helpers
+    // Check if amount is Exceeding Balance
     const isBuyAmountExceedingBalance = () => {
         if (!buyAmount || !isConnected) return false;
         return parseFloat(buyAmount) > parseFloat(usdtBalance);
@@ -170,10 +175,10 @@ export default function TradeCard({
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="buy" className="w-full" onValueChange={handleTabChange}>
+                <Tabs defaultValue={defaultTab} className="w-full" onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-2 ">
                         <TabsTrigger value="buy" className="cursor-pointer ">Invest</TabsTrigger>
-                        <TabsTrigger value="sell" className="cursor-pointer">Withdraw</TabsTrigger>
+                        <TabsTrigger value="sell" className="cursor-pointer">Redeem</TabsTrigger>
                     </TabsList>
 
                     <BuyTab
