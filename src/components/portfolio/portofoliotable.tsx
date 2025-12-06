@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, ArrowLeftRight, PlusCircle, TrendingUp } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 
 interface PortfolioAsset {
   productId: string;
@@ -13,8 +13,6 @@ interface PortfolioAsset {
   categoryId: string;
   icon: React.ComponentType<{ className?: string }>;
   balance: number;
-  value?: number;
-  returnPercent?: number;
 }
 
 interface PortfolioTableProps {
@@ -22,7 +20,7 @@ interface PortfolioTableProps {
   isLoading: boolean;
   isConnected: boolean;
   onInvest: (productId: string) => void;
-  onSwap: (productId: string, symbol: string) => void;
+  onSwap: (productId: string) => void;
   onSell: (productId: string) => void;
 }
 
@@ -83,18 +81,13 @@ export default function PortfolioTable({
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-semibold text-sm text-muted-foreground">Asset</th>
                   <th className="text-left py-3 px-4 font-semibold text-sm text-muted-foreground">Sector</th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-muted-foreground">Balance</th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-muted-foreground">Value</th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-muted-foreground">Return</th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-muted-foreground">Actions</th>
+                  <th className="text-right py-3 px-4 font-semibold text-sm text-muted-foreground">Balance</th>
+                  <th className="text-right py-3 px-4 font-semibold text-sm text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {activeAssets.map((asset) => {
                   const AssetIcon = asset.icon;
-                  // Mock data for value and return if not provided
-                  const value = asset.value || asset.balance * 100;
-                  const returnPercent = asset.returnPercent || (Math.random() * 15 + 2);
 
                   return (
                     <tr
@@ -106,7 +99,10 @@ export default function PortfolioTable({
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                             <AssetIcon className="h-5 w-5 text-primary" />
                           </div>
-                          <span className="font-medium text-[#0A6A74]">{asset.productName}</span>
+                          <div>
+                            <p className="font-medium text-[#0A6A74]">{asset.productName}</p>
+                            <p className="text-xs text-muted-foreground font-mono">${asset.symbol}</p>
+                          </div>
                         </div>
                       </td>
                       <td className="py-4 px-4">
@@ -114,61 +110,38 @@ export default function PortfolioTable({
                           {asset.categoryId}
                         </Badge>
                       </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="font-semibold">
-                          {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Tokens
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="font-semibold">
-                          {value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} USDT
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                          <span className="font-semibold text-green-600">
-                            +{returnPercent.toFixed(1)}%
-                          </span>
+                      <td className="py-4 px-4 text-right">
+                        <div>
+                          <p className="font-semibold">
+                            {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {asset.symbol}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            H {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                          </p>
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-end gap-2 ">
                           <Button
                             size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSwap(asset.productId, asset.symbol);
-                            }}
-                            className="h-8 px-3 text-xs border-[#0A6A74] text-[#0A6A74] hover:bg-[#0A6A74] hover:text-white cursor-pointer"
+                            onClick={() => onInvest(asset.productId)}
+                            className="bg-green-600 hover:bg-green-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                           >
-                            <ArrowLeftRight className="h-3 w-3 mr-1" />
+                            Invest
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => onSwap(asset.productId)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                          >
                             Swap
                           </Button>
                           <Button
                             size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSell(asset.productId);
-                            }}
-                            className="h-8 px-3 text-xs border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white cursor-pointer"
+                            onClick={() => onSell(asset.productId)}
+                            className="bg-red-600 hover:bg-red-700 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                           >
-                            <Wallet className="h-3 w-3 mr-1" />
-                            Redeem
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onInvest(asset.productId);
-                            }}
-                            className="h-8 px-3 text-xs border-[#225B3A] text-[#225B3A] hover:bg-[#225B3A] hover:text-white cursor-pointer"
-                          >
-                            <PlusCircle className="h-3 w-3 mr-1" />
-                            Invest
+                            Sell
                           </Button>
                         </div>
                       </td>
