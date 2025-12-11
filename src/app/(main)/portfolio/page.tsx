@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, Landmark, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Wallet, Landmark, Users, ChevronRight } from 'lucide-react';
 import { usePortfolioBalances } from '@/hooks/usePortfolioBalances';
+import { useUserManagerInvestments } from '@/hooks/useAutoManage';
+import { managerMetadata, defaultManagerMetadata, getRiskColor } from '@/lib/constants/manager-metadata';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import PortfolioTable from '@/components/portfolio/portofoliotable';
 import SwapDialog from '@/components/swap/swap-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Image from 'next/image';
 
 export default function PortfolioPage() {
   const router = useRouter();
@@ -18,8 +23,11 @@ export default function PortfolioPage() {
   // Get actual wallet balances for all P2P tokens and USDT
   const { activeAssets, totalValue, usdtBalance, isLoading, isConnected } = usePortfolioBalances();
 
-  // Calculate total portfolio value as USDT + Total Invested
-  const totalPortfolioValue = usdtBalance + totalValue;
+  // Get user's manager investments
+  const { investments: managerInvestments, totalInvested: totalManagerInvested, isLoading: isLoadingManager } = useUserManagerInvestments();
+
+  // Calculate total portfolio value as USDT + Total Invested (P2P + Manager)
+  const totalPortfolioValue = usdtBalance + totalValue + totalManagerInvested;
 
   const handleInvest = (productId: string) => {
     // Navigate to market detail page with invest/buy tab active
@@ -156,17 +164,121 @@ export default function PortfolioPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium text-muted-foreground">
-                  {isConnected ? 'No managed investments found' : 'Connect your wallet to view investments'}
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {isConnected
-                    ? 'Invest with professional managers to diversify your portfolio'
-                    : 'Your managed investments will appear here once connected'}
-                </p>
-              </div>
+              {isLoadingManager ? (
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                      <Skeleton className="w-12 h-12 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-6 w-20" />
+                    </div>
+                  ))}
+                </div>
+              ) : !isConnected ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-lg font-medium text-muted-foreground">
+                    Connect your wallet to view investments
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Your managed investments will appear here once connected
+                  </p>
+                </div>
+              ) : managerInvestments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-lg font-medium text-muted-foreground">
+                    No managed investments found
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Invest with professional managers to diversify your portfolio
+                  </p>
+                  <Button
+                    className="mt-4 bg-[#225B3A] hover:bg-[#1C4A30]"
+                    onClick={() => router.push('/auto-manage')}
+                  >
+                    Browse Managers
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Total Manager Investment Summary */}
+                  <div className="p-4 rounded-lg bg-[#225B3A]/5 border border-[#225B3A]/20">
+                    <p className="text-sm text-muted-foreground">Total Manager Investments</p>
+                    <p className="text-2xl font-bold text-[#225B3A]">
+                      ${totalManagerInvested.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+
+                  {/* Manager Investment List */}
+                  <div className="space-y-3">
+                    {managerInvestments.map((investment) => {
+                      const addressLower = investment.managerAddress.toLowerCase();
+                      const metadata = managerMetadata[addressLower] || defaultManagerMetadata;
+                      const displayName = metadata.displayName || investment.managerName;
+
+                      return (
+                        <div
+                          key={investment.managerAddress}
+                          className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                          onClick={() => router.push(`/auto-manage/${investment.managerAddress}`)}
+                        >
+                          {/* Manager Avatar */}
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-muted">
+                            <Image
+                              src={metadata.avatar}
+                              alt={displayName}
+                              width={48}
+                              height={48}
+                              className="object-cover w-full h-full"
+                              unoptimized
+                            />
+                          </div>
+
+                          {/* Manager Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold">{displayName}</p>
+                              <Badge
+                                variant="outline"
+                                className={`${getRiskColor(metadata.riskLevel)} text-xs`}
+                              >
+                                {metadata.riskLevel}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              Share: {investment.sharePercentage.toFixed(2)}%
+                            </p>
+                          </div>
+
+                          {/* Investment Amount */}
+                          <div className="text-right">
+                            <p className="font-semibold text-[#0A6A74]">
+                              ${investment.depositAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Deposited</p>
+                          </div>
+
+                          {/* Arrow */}
+                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Browse More Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.push('/auto-manage')}
+                  >
+                    Browse More Managers
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
