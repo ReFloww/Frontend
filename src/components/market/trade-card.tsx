@@ -137,7 +137,7 @@ export default function TradeCard({
         return (numValue * platformFee / 100).toFixed(2);
     };
 
-    // Balance validation helpers
+    // Check if amount is Exceeding Balance
     const isBuyAmountExceedingBalance = () => {
         if (!buyAmount || !isConnected) return false;
         return parseFloat(buyAmount) > parseFloat(usdtBalance);
