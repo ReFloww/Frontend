@@ -3,10 +3,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calculator } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import TradeCard from '@/components/market/trade-card';
+import ProductAnalytics from '@/components/market/product-analytics';
+import ProductInformation from '@/components/market/product-information';
 import { getProductById, getCreditRatingColor } from '@/lib/constants/product-market';
 
 interface LoanCalculation {
@@ -99,68 +101,68 @@ export default function ProductDetailPage() {
                 Back to Market
             </Button>
 
-            {/* Product Header with Symbol */}
-            <Card className="border-2">
-                <CardHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary/10">
-                                <ProductIcon className="h-8 w-8 text-primary" />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                    <CardTitle className="text-2xl text-[#0A6A74]">{product.productName}</CardTitle>
-                                    <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 font-mono font-bold text-lg px-3 py-1">
-                                        ${product.symbol}
-                                    </Badge>
+            {/* Two Column Layout: Product Details (Left) + Trade Card (Right) */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Left Side: Product Details Card */}
+                <Card className="border-2">
+                    <CardHeader>
+                        <div className="flex items-start justify-between flex-wrap gap-3">
+                            <div className="flex items-start gap-4">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                                    <ProductIcon className="h-8 w-8 text-primary" />
                                 </div>
-                                <CardDescription className="text-base">{product.categoryId}</CardDescription>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                        <CardTitle className="text-2xl text-[#0A6A74]">{product.productName}</CardTitle>
+                                        <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 font-mono font-bold text-lg px-3 py-1">
+                                            ${product.symbol}
+                                        </Badge>
+                                    </div>
+                                    <CardDescription className="text-base">{product.categoryId}</CardDescription>
+                                </div>
                             </div>
+                            <Badge className={getCreditRatingColor(product.creditRate)}>
+                                Credit Rating: {product.creditRate}
+                            </Badge>
                         </div>
-                        <Badge className={getCreditRatingColor(product.creditRate)}>
-                            Credit Rating: {product.creditRate}
-                        </Badge>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-6 md:grid-cols-2">
+                    </CardHeader>
+                    <CardContent>
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-muted-foreground">Description</p>
                                 <p className="text-base font-medium">{product.description}</p>
                             </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Loan Amount</p>
-                                <p className="text-2xl font-bold">${product.loanAmount.toLocaleString()}</p>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Loan Amount</p>
+                                    <p className="text-2xl font-bold">${product.loanAmount.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Interest Rate</p>
+                                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                        {product.loanInterest.toFixed(2)}% p.a.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Loan Tenor</p>
+                                    <p className="text-base font-medium">{product.loanTenor} months</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Category</p>
+                                    <p className="text-base font-medium">{product.categoryId}</p>
+                                </div>
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Contract ID</p>
-                                <p className="text-sm font-mono text-gray-500">{product.tokenP2PAddress}</p>
+                                <p className="text-sm font-mono text-gray-500 break-all">{product.tokenP2PAddress}</p>
                             </div>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Interest Rate</p>
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                    {product.loanInterest.toFixed(2)}% p.a.
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Loan Tenor</p>
-                                <p className="text-base font-medium">{product.loanTenor} months</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Category</p>
-                                <p className="text-base font-medium">{product.categoryId}</p>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
 
-            {/* Two Cards Side by Side */}
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* Left Card: Investment Input */}
+                {/* Right Side: Trade Card */}
                 <TradeCard
                     maxAmount={product.loanAmount}
                     onAmountChange={handleAmountChange}
@@ -169,6 +171,12 @@ export default function ProductDetailPage() {
                     defaultTab={defaultTab}
                 />
             </div>
+
+            {/* Product Analytics */}
+            <ProductAnalytics product={product} />
+
+            {/* Product Information */}
+            <ProductInformation product={product} />
         </div>
     );
 }
