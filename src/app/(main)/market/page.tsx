@@ -12,7 +12,8 @@ import { Sprout, Fish, TreePine, Loader2, AlertCircle } from 'lucide-react';
 import { TokenizedProduct } from '@/types/product-market';
 
 // Icon mapping based on category
-const getCategoryIcon = (category: string) => {
+const getCategoryIcon = (category: string | null | undefined) => {
+  if (!category) return Sprout;
   switch (category.toLowerCase()) {
     case 'agriculture':
       return Sprout;
@@ -161,7 +162,15 @@ export default function MarketPage() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Contract ID</span>
-                        <span className="font-semibold text-xs font-mono text-foreground">{product.contractId}</span>
+                        <a
+                          href={`https://sepolia.basescan.org/address/${product.contractId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-xs font-mono text-foreground hover:underline hover:text-primary z-10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {product.contractId.slice(0, 5)}...{product.contractId.slice(-3)}
+                        </a>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Unique Investors</span>
