@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 import TradeCard from '@/components/market/trade-card';
 import ProductAnalytics from '@/components/market/product-analytics';
 import ProductInformation from '@/components/market/product-information';
-import { getProductById, getCreditRatingColor } from '@/lib/constants/product-market';
 import { getCreditRatingColor } from '@/lib/constants/product-market';
 import { fetchMarketItemById, MarketItem } from '@/lib/api';
 import { TokenizedProduct } from '@/types/product-market';
@@ -196,40 +195,40 @@ export default function ProductDetailPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Description</p>
-                                <p className="text-base font-medium">{product.description}</p>
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Description</p>
+                                    <p className="text-base font-medium">{product.description}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Loan Amount</p>
+                                    <p className="text-2xl font-bold">${product.loanAmount.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Contract ID</p>
+                                    <a
+                                        href={`https://sepolia.basescan.org/address/${product.tokenP2PAddress}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors w-fit"
+                                    >
+                                        <p className="text-sm font-mono text-gray-500">{product.tokenP2PAddress}</p>
+                                        <ArrowUpRight className="h-4 w-4 text-gray-500" />
+                                    </a>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Status</p>
+                                    <p className="text-base font-medium uppercase">{product.status}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Loan Amount</p>
-                                <p className="text-2xl font-bold">${product.loanAmount.toLocaleString()}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Contract ID</p>
-                                <a
-                                    href={`https://sepolia.basescan.org/address/${product.tokenP2PAddress}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors w-fit"
-                                >
-                                    <p className="text-sm font-mono text-gray-500">{product.tokenP2PAddress}</p>
-                                    <ArrowUpRight className="h-4 w-4 text-gray-500" />
-                                </a>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Status</p>
-                                <p className="text-base font-medium uppercase">{product.status}</p>
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Interest Rate</p>
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                    {product.loanInterest.toFixed(2)}% p.a.
-                                </p>
-                            </div>
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Interest Rate</p>
+                                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                        {product.loanInterest.toFixed(2)}% p.a.
+                                    </p>
+                                </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">Loan Tenor</p>
                                     <p className="text-base font-medium">{product.loanTenor} months</p>
@@ -238,10 +237,6 @@ export default function ProductDetailPage() {
                                     <p className="text-sm text-muted-foreground">Category</p>
                                     <p className="text-base font-medium">{product.categoryId}</p>
                                 </div>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Contract ID</p>
-                                <p className="text-sm font-mono text-gray-500 break-all">{product.tokenP2PAddress}</p>
                             </div>
                         </div>
                     </CardContent>
