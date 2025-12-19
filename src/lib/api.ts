@@ -143,3 +143,82 @@ export async function fetchMarketItemById(id: string): Promise<MarketItem> {
         throw error;
     }
 }
+
+/**
+ * Transaction History Types
+ */
+export interface TransactionHistoryItem {
+    id: string;
+    type: string;
+    from: string;
+    to: string;
+    amountIn: string;
+    amountOut: string;
+    transactionHash: string;
+    timestamp: string;
+    blockNumber: string;
+}
+
+export interface RepaymentHistoryItem {
+    id: string;
+    contractAddress: string;
+    repaymentNumber: string;
+    principalPaid: string;
+    interestPaid: string;
+    totalDistributed: string;
+    remainingPrincipal: string;
+    transactionHash: string;
+    timestamp: string;
+    blockNumber: string;
+}
+
+/**
+ * Fetch transaction history for a user
+ */
+export async function fetchTransactionHistory(userAddress: string): Promise<TransactionHistoryItem[]> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/history/transactions?user=${userAddress}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const result: TransactionHistoryItem[] = await response.json();
+        return result || [];
+    } catch (error) {
+        console.error('Failed to fetch transaction history:', error);
+        throw error;
+    }
+}
+
+/**
+ * Fetch repayment history for a user
+ */
+export async function fetchRepaymentHistory(userAddress: string): Promise<RepaymentHistoryItem[]> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/history/repayments?user=${userAddress}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const result: RepaymentHistoryItem[] = await response.json();
+        return result || [];
+    } catch (error) {
+        console.error('Failed to fetch repayment history:', error);
+        throw error;
+    }
+}
+
