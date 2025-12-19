@@ -14,6 +14,7 @@ export interface MarketItem {
     name: string;
     symbol: string;
     holderCount: string;
+    status: string;
     description: string;
     loanInterest: string;
     loanAmount: string;
@@ -118,3 +119,27 @@ export async function fetchManagerById(id: string): Promise<ManagerItem> {
     }
 }
 
+/**
+ * Fetch market item by ID from API
+ */
+export async function fetchMarketItemById(id: string): Promise<MarketItem> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/market/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store', // Disable caching for fresh data
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const result: MarketItem = await response.json();
+        return result;
+    } catch (error) {
+        console.error(`Failed to fetch market item ${id}:`, error);
+        throw error;
+    }
+}

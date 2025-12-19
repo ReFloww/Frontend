@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { getCreditRatingColor } from '@/lib/constants/product-market';
 import { fetchMarketList, MarketItem } from '@/lib/api';
-import { Sprout, Fish, TreePine, Loader2, AlertCircle } from 'lucide-react';
+import { Sprout, Fish, TreePine, Loader2, AlertCircle, ArrowUpRight } from 'lucide-react';
 import { TokenizedProduct } from '@/types/product-market';
 
 // Icon mapping based on category
@@ -40,6 +40,7 @@ const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
   contractId: item.contractAddress,
   tokenP2PAddress: item.contractAddress as `0x${string}`,
   holderCount: parseInt(item.holderCount) || 0,
+  status: item.status,
   icon: getCategoryIcon(item.categoryId),
 });
 
@@ -166,10 +167,11 @@ export default function MarketPage() {
                           href={`https://sepolia.basescan.org/address/${product.contractId}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-xs font-mono text-foreground hover:underline hover:text-primary z-10"
+                          className="font-semibold text-xs font-mono text-foreground hover:underline hover:text-primary z-10 flex items-center gap-1"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {product.contractId.slice(0, 5)}...{product.contractId.slice(-3)}
+                          <ArrowUpRight className="h-3 w-3" />
                         </a>
                       </div>
                       <div className="flex justify-between text-sm">

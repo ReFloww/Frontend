@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, ChevronDown, Users, Wallet, Loader2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { fetchManagerList, ManagerItem } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 
@@ -29,6 +30,13 @@ const formatRiskLevel = (riskLevel: string | null): string => {
   if (level.includes('medium')) return 'Medium Risk';
   if (level.includes('low')) return 'Low Risk';
   return riskLevel;
+};
+
+const MANAGER_LOGOS: Record<string, string> = {
+  'BNI AM': '/images/logo-BNI.png',
+  'MANDIRI MI': '/images/logo-MANDIRI.png',
+  'Mandiri MI': '/images/logo-MANDIRI.png',
+  'BRI MI': '/images/logo-BRI.png',
 };
 
 const formatCurrency = (value: string | null): string => {
@@ -152,10 +160,24 @@ export default function AutoManagePage() {
               {/* Main Card Content */}
               <div className="flex items-center gap-6 p-6">
                 {/* Avatar Placeholder */}
-                <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">
-                    {manager.name.charAt(0).toUpperCase()}
-                  </span>
+                {/* Avatar / Logo */}
+                <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-white border border-gray-100 flex items-center justify-center p-2">
+                  {MANAGER_LOGOS[manager.name] ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={MANAGER_LOGOS[manager.name]}
+                        alt={`${manager.name} Logo`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center rounded-lg">
+                      <span className="text-3xl font-bold text-white">
+                        {manager.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}

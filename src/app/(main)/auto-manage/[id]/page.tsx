@@ -16,6 +16,7 @@ import {
     Unlock
 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import { fetchManagerById, ManagerItem } from '@/lib/api';
 import ManagerChartsWithTabs from '@/components/ManagerChartsWithTabs';
 
@@ -31,6 +32,13 @@ const getRiskColor = (riskLevel: string | null) => {
         return 'border-green-400 text-green-500 bg-green-50 dark:bg-green-900/20';
     }
     return 'border-gray-400 text-gray-500 bg-gray-50 dark:bg-gray-900/20';
+};
+
+const MANAGER_LOGOS: Record<string, string> = {
+    'BNI AM': '/images/logo-BNI.png',
+    'MANDIRI MI': '/images/logo-MANDIRI.png',
+    'Mandiri MI': '/images/logo-MANDIRI.png',
+    'BRI MI': '/images/logo-BRI.png',
 };
 
 const formatRiskLevel = (riskLevel: string | null): string => {
@@ -137,10 +145,23 @@ export default function ManagerDetailPage() {
                     <Card className="border-2">
                         <CardContent className="p-6">
                             <div className="flex items-start gap-6">
-                                <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center">
-                                    <span className="text-4xl font-bold text-white">
-                                        {manager.name.charAt(0).toUpperCase()}
-                                    </span>
+                                <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0 bg-white border border-gray-100 flex items-center justify-center p-2">
+                                    {MANAGER_LOGOS[manager.name] ? (
+                                        <div className="relative w-full h-full">
+                                            <Image
+                                                src={MANAGER_LOGOS[manager.name]}
+                                                alt={`${manager.name} Logo`}
+                                                fill
+                                                className="object-contain"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center rounded-xl">
+                                            <span className="text-4xl font-bold text-white">
+                                                {manager.name.charAt(0).toUpperCase()}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
