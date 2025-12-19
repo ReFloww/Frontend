@@ -13,7 +13,8 @@ import {
     Loader2,
     AlertCircle,
     TrendingUp,
-    Unlock
+    Unlock,
+    ExternalLink
 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
@@ -285,11 +286,27 @@ export default function ManagerDetailPage() {
                         <CardContent className="space-y-3">
                             <div>
                                 <p className="text-sm text-muted-foreground mb-1">Contract Address</p>
-                                <p className="font-mono text-sm bg-muted p-2 rounded break-all">{manager.contractAddress}</p>
+                                <a
+                                    href={`https://sepolia.mantlescan.xyz/address/${manager.contractAddress}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-primary hover:underline font-mono text-sm bg-muted p-2 rounded break-all"
+                                >
+                                    {manager.contractAddress}
+                                    <ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground mb-1">Owner Address</p>
-                                <p className="font-mono text-sm bg-muted p-2 rounded break-all">{manager.owner}</p>
+                                <a
+                                    href={`https://sepolia.mantlescan.xyz/address/${manager.owner}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-primary hover:underline font-mono text-sm bg-muted p-2 rounded break-all"
+                                >
+                                    {manager.owner}
+                                    <ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
                             </div>
                         </CardContent>
                     </Card>

@@ -172,8 +172,8 @@ export default function HistoryPage() {
                         <TableCell>
                           <span
                             className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${tx.type === 'Supply' || tx.type === 'Mint'
-                                ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                                : 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                              ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                              : 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                               }`}
                           >
                             {tx.type}
@@ -186,7 +186,7 @@ export default function HistoryPage() {
                         </TableCell>
                         <TableCell>
                           <a
-                            href={`https://sepolia.etherscan.io/tx/${tx.transactionHash}`}
+                            href={`https://sepolia.mantlescan.xyz/tx/${tx.transactionHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
@@ -238,7 +238,17 @@ export default function HistoryPage() {
                   <TableBody>
                     {repaymentData.map((rep) => (
                       <TableRow key={rep.id}>
-                        <TableCell className="font-mono text-xs">{shortenAddress(rep.contractAddress)}</TableCell>
+                        <TableCell>
+                          <a
+                            href={`https://sepolia.mantlescan.xyz/address/${rep.contractAddress}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
+                          >
+                            {shortenAddress(rep.contractAddress)}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </TableCell>
                         <TableCell>
                           <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
                             #{rep.repaymentNumber}
@@ -249,7 +259,7 @@ export default function HistoryPage() {
                         <TableCell className="font-semibold">{formatAmount(rep.totalDistributed)} USDC</TableCell>
                         <TableCell>
                           <a
-                            href={`https://sepolia.etherscan.io/tx/${rep.transactionHash}`}
+                            href={`https://sepolia.mantlescan.xyz/tx/${rep.transactionHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"

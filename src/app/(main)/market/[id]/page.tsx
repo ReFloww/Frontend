@@ -208,7 +208,7 @@ export default function ProductDetailPage() {
                                 <div>
                                     <p className="text-sm text-muted-foreground">Contract ID</p>
                                     <a
-                                        href={`https://sepolia.basescan.org/address/${product.tokenP2PAddress}`}
+                                        href={`https://sepolia.mantlescan.xyz/address/${product.tokenP2PAddress}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors w-fit"
