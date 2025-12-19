@@ -16,6 +16,8 @@ export interface TokenizedProduct {
   creditRate: 'A' | 'B' | 'C';
   contractId: string;
   tokenP2PAddress: `0x${string}`; // TokenP2P contract address for this product
+  holderCount: number; // Number of unique investors
+  status: string; // Product status from onchain
   icon: LucideIcon; // For UI display
 }
 
