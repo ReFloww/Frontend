@@ -3,13 +3,48 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Loader2, AlertCircle, Sprout, Fish, TreePine } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TradeCard from '@/components/market/trade-card';
 import ProductAnalytics from '@/components/market/product-analytics';
 import ProductInformation from '@/components/market/product-information';
-import { getProductById, getCreditRatingColor } from '@/lib/constants/product-market';
+import { getCreditRatingColor } from '@/lib/constants/product-market';
+import { fetchMarketItemById, MarketItem } from '@/lib/api';
+import { TokenizedProduct } from '@/types/product-market';
+
+// Icon mapping based on category
+const getCategoryIcon = (category: string | null | undefined) => {
+    if (!category) return Sprout;
+    switch (category.toLowerCase()) {
+        case 'agriculture':
+            return Sprout;
+        case 'fisheries':
+            return Fish;
+        case 'forestry':
+            return TreePine;
+        default:
+            return Sprout;
+    }
+};
+
+// Convert API response to TokenizedProduct format
+const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
+    id: item.id,
+    productName: item.name,
+    symbol: item.symbol,
+    categoryId: item.categoryId as 'Agriculture' | 'Fisheries' | 'Forestry',
+    description: item.description,
+    loanInterest: parseFloat(item.loanInterest),
+    loanAmount: parseFloat(item.loanAmount),
+    loanTenor: item.loanTenor,
+    creditRate: item.creditRate as 'A' | 'B' | 'C',
+    contractId: item.contractAddress,
+    tokenP2PAddress: item.contractAddress as `0x${string}`,
+    holderCount: parseInt(item.holderCount) || 0,
+    status: item.status,
+    icon: getCategoryIcon(item.categoryId),
+});
 
 interface LoanCalculation {
     monthlyPrincipal: number;
@@ -27,9 +62,31 @@ export default function ProductDetailPage() {
     // Get the tab query parameter (default to 'buy' if not specified)
     const defaultTab = searchParams.get('tab') === 'sell' ? 'sell' : 'buy';
 
-    const product = getProductById(productId);
+    const [product, setProduct] = useState<TokenizedProduct | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [investmentAmount, setInvestmentAmount] = useState<string>('');
     const [calculation, setCalculation] = useState<LoanCalculation | null>(null);
+
+    // Fetch product data on component mount
+    useEffect(() => {
+        const loadProduct = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await fetchMarketItemById(productId);
+                const mappedProduct = mapApiToProduct(data);
+                setProduct(mappedProduct);
+            } catch (err) {
+                console.error('Error loading product:', err);
+                setError('Failed to load product details. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadProduct();
+    }, [productId]);
 
     const calculateReturns = (amount: number) => {
         if (!product || amount <= 0) {
@@ -69,6 +126,34 @@ export default function ProductDetailPage() {
         }
     };
 
+    // Loading state
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                    <p className="text-muted-foreground">Loading product details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center space-y-4">
+                    <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
+                    <p className="text-destructive font-medium">{error}</p>
+                    <Button onClick={() => window.location.reload()} variant="outline">
+                        Retry
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // Product not found state
     if (!product) {
         return (
             <div className="flex min-h-screen items-center justify-center">
@@ -156,7 +241,15 @@ export default function ProductDetailPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Contract ID</p>
-                                <p className="text-sm font-mono text-gray-500 break-all">{product.tokenP2PAddress}</p>
+                                <a
+                                    href={`https://sepolia.basescan.org/address/${product.tokenP2PAddress}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-semibold text-xs font-mono text-foreground hover:underline hover:text-primary flex items-center gap-1 break-all"
+                                >
+                                    {product.tokenP2PAddress}
+                                    <ArrowUpRight className="h-3 w-3 flex-shrink-0" />
+                                </a>
                             </div>
                         </div>
                     </CardContent>
