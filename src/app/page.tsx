@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -265,7 +266,7 @@ function HeroSection() {
 function WhatIsReFlowSection() {
   return (
     <section id="about" className="py-14 md:py-20 lg:py-24 bg-white">
-      <div className="w-[calc(100%-2rem)] max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Label */}
         <div className="flex justify-center mb-10 md:mb-14">
           <span className="inline-block px-5 md:px-6 py-2 bg-white text-[#255C9C] rounded-full text-xs md:text-sm font-medium border border-[#255C9C]">
@@ -273,30 +274,30 @@ function WhatIsReFlowSection() {
           </span>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+        {/* Horizontal Layout: Image | Content */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Image */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-[280px] md:max-w-[300px] lg:max-w-[340px]">
+            <div className="relative w-full max-w-[320px] md:max-w-[360px]">
               <Image
                 src="/images/what-is-reflow-image.png"
                 alt="Real-World Lending"
                 width={400}
                 height={300}
-                className="w-full h-auto rounded-2xl shadow-md"
+                className="w-full h-auto rounded-2xl shadow-lg"
               />
             </div>
           </div>
 
           {/* Content */}
-          <div className="text-center md:text-left md:pl-0 lg:pl-0">
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1a1a2e] leading-tight">
-              Real-World Lending Logic,<br />
-              Upgraded
+          <div className="text-center md:text-left">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1a1a2e] leading-tight mb-4">
+              P2P Lending with <br />
+              <span className="text-[#255C9C]">Full Transparency and Liquidity</span>
             </h2>
-            <p className="mt-3 md:mt-4 text-gray-500 text-sm md:text-base leading-relaxed max-w-sm mx-auto md:mx-0">
-              Built on the proven framework of Restock.id, ReFlow transforms
-              traditional P2P lending mechanics into a transparent and
-              programmable blockchain ecosystem.
+            <p className="text-gray-500 text-sm md:text-base leading-relaxed">
+              ReFlow is a platform that helps P2P lending investors access their money sooner.
+              Instead of waiting until the loan ends, investors can sell their investment to others who want to earn the returns.
             </p>
           </div>
         </div>
@@ -305,66 +306,43 @@ function WhatIsReFlowSection() {
   );
 }
 
-// Key Features Section
-function KeyFeaturesSection() {
-  const features = [
-    {
-      icon: "/images/icon-lending.png",
-      title: "Built on Proven Lending Logic",
-      description: "ReFlow adapts Restock.id's successful lending flow with a fully on-chain backend."
-    },
-    {
-      icon: "/images/icon-security.png",
-      title: "Institutional-Grade Security",
-      description: "Smart contracts and immutable ledgers protect every asset and transaction."
-    },
-    {
-      icon: "/images/icon-availability.png",
-      title: "Always-On Availability",
-      description: "On-chain infrastructure keeps lending open, verifiable, and accessible anytime."
-    },
-    {
-      icon: "/images/icon-yield.png",
-      title: "Optimized Yield Efficiency",
-      description: "Clear fees and streamlined operations ensure lenders keep more of their returns."
-    }
+// Managers Marquee Section
+function ManagersMarquee() {
+  const managers = [
+    { name: 'BRI', logo: '/images/BRI-logo.png' },
+    { name: 'BNI', logo: '/images/BNI-logo.png' },
+    { name: 'Mandiri', logo: '/images/Mandiri-logo.png' },
   ];
 
-  return (
-    <section id="features" className="py-14 md:py-20 lg:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Label */}
-        <div className="flex justify-center mb-10 md:mb-14">
-          <span className="inline-block px-5 md:px-6 py-2 bg-white text-[#255C9C] rounded-full text-xs md:text-sm font-medium border border-[#255C9C]">
-            Key Features
-          </span>
-        </div>
+  // Repeat enough times to fill screen
+  const repeatedManagers = [...managers, ...managers, ...managers, ...managers, ...managers, ...managers];
 
-        {/* Features Grid - 2x2 layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 max-w-4xl mx-auto">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="rounded-2xl p-6 md:p-8 transition-all duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #79B7D2 0%, #255C9C 100%)'
-              }}
-            >
-              <div className="w-10 h-10 md:w-12 md:h-12 mb-4 relative">
-                <Image
-                  src={feature.icon}
-                  alt=""
-                  width={48}
-                  height={48}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-2 leading-snug">
-                {feature.title}
-              </h3>
-              <p className="text-white/80 text-sm leading-relaxed">
-                {feature.description}
-              </p>
+  return (
+    <section className="py-4 md:py-5" style={{ backgroundColor: '#F9FBFD' }}>
+      <div className="marquee">
+        <div className="marquee-track">
+          {/* First half */}
+          {repeatedManagers.map((manager, index) => (
+            <div key={`a-${index}`} className="marquee-item">
+              <Image
+                src={manager.logo}
+                alt={manager.name}
+                width={120}
+                height={48}
+                className="h-8 md:h-10 w-auto object-contain opacity-70"
+              />
+            </div>
+          ))}
+          {/* Second half for seamless loop */}
+          {repeatedManagers.map((manager, index) => (
+            <div key={`b-${index}`} className="marquee-item">
+              <Image
+                src={manager.logo}
+                alt={manager.name}
+                width={120}
+                height={48}
+                className="h-8 md:h-10 w-auto object-contain opacity-70"
+              />
             </div>
           ))}
         </div>
@@ -373,57 +351,351 @@ function KeyFeaturesSection() {
   );
 }
 
-// Why Lenders Choose ReFlow Section
+// Simple Flow Diagram with numbered nodes
+const FlowDiagram = ({ steps }: { steps: string[] }) => (
+  <svg viewBox="0 0 500 95" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+    {/* Curved connecting paths */}
+    <path
+      d="M60 25 Q100 25 115 35 Q130 50 160 50"
+      fill="none"
+      stroke="rgba(255,255,255,0.3)"
+      strokeWidth="2"
+      strokeDasharray="5 4"
+    />
+    <path
+      d="M200 50 Q230 50 245 35 Q260 20 290 20"
+      fill="none"
+      stroke="rgba(255,255,255,0.3)"
+      strokeWidth="2"
+      strokeDasharray="5 4"
+    />
+    <path
+      d="M330 20 Q360 20 375 35 Q390 50 420 50"
+      fill="none"
+      stroke="rgba(255,255,255,0.3)"
+      strokeWidth="2"
+      strokeDasharray="5 4"
+    />
+
+    {/* Node 1 */}
+    <circle cx="50" cy="25" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
+    <text x="50" y="30" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">1</text>
+    <text x="50" y="53" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[0]}</text>
+
+    {/* Node 2 */}
+    <circle cx="180" cy="50" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
+    <text x="180" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">2</text>
+    <text x="180" y="78" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[1]}</text>
+
+    {/* Node 3 */}
+    <circle cx="310" cy="20" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
+    <text x="310" y="25" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">3</text>
+    <text x="310" y="48" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[2]}</text>
+
+    {/* Node 4 */}
+    <circle cx="440" cy="50" r="14" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
+    <text x="440" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">4</text>
+    <text x="440" y="78" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[3]}</text>
+  </svg>
+);
+
+// Key Features Section - Stacked Cards (Slide & Fade)
+function KeyFeaturesSection() {
+  const [activeMode, setActiveMode] = React.useState<'managed' | 'self'>('managed');
+
+  const managedSteps = ['Deposit', 'Auto Allocate', 'Earn Yield', 'Exit Anytime'];
+  const selfSteps = ['Browse', 'Buy Tokens', 'Monitor', 'Sell / Hold'];
+
+  return (
+    <section id="features" className="py-14 md:py-20 lg:py-24 bg-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Label */}
+        <div className="flex justify-center mb-6 md:mb-8">
+          <span className="inline-block px-5 md:px-6 py-2 bg-white text-[#255C9C] rounded-full text-xs md:text-sm font-medium border border-[#255C9C]">
+            Choose How You Lend
+          </span>
+        </div>
+
+        {/* Subtitle */}
+        <p className="text-center text-gray-500 text-sm md:text-base mb-8 max-w-md mx-auto">
+          Two modes. You decide.
+        </p>
+
+        {/* Toggle - NOW AT TOP with colors */}
+        <div className="flex justify-center mb-8">
+          <div className="relative inline-flex items-center p-1 bg-gray-100 rounded-full">
+            {/* Sliding background indicator */}
+            <div
+              className={`absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-out ${
+                activeMode === 'managed'
+                  ? 'left-1 w-[100px] md:w-[110px] bg-gradient-to-r from-[#5A9FCA] to-[#2E6BA8]'
+                  : 'left-[108px] md:left-[118px] w-[120px] md:w-[130px] bg-gradient-to-r from-[#7B6BA5] to-[#4A3F7B]'
+              }`}
+            />
+            <button
+              onClick={() => setActiveMode('managed')}
+              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
+                activeMode === 'managed'
+                  ? 'text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Managed
+            </button>
+            <button
+              onClick={() => setActiveMode('self')}
+              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
+                activeMode === 'self'
+                  ? 'text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Self-Managed
+            </button>
+          </div>
+        </div>
+
+        {/* Single Card - Changes based on toggle */}
+        <div
+          className="rounded-2xl p-6 md:p-8 shadow-lg transition-all duration-400"
+          style={{
+            background: activeMode === 'managed'
+              ? 'linear-gradient(145deg, #5A9FCA 0%, #2E6BA8 100%)'
+              : 'linear-gradient(145deg, #7B6BA5 0%, #4A3F7B 100%)'
+          }}
+        >
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
+            <div>
+              <h3 className="text-xl md:text-2xl font-semibold text-white mb-1">
+                {activeMode === 'managed' ? 'Managed Lending' : 'Self-Managed Lending'}
+              </h3>
+              <p className="text-white/70 text-sm">
+                {activeMode === 'managed' ? 'Set it and forget it' : 'Full control over your portfolio'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
+              {activeMode === 'managed' ? (
+                <>
+                  <span className="px-3 py-1 bg-white/15 rounded-full text-white/90 text-xs">Beginners</span>
+                  <span className="px-3 py-1 bg-white/15 rounded-full text-white/90 text-xs">Passive</span>
+                </>
+              ) : (
+                <>
+                  <span className="px-3 py-1 bg-white/15 rounded-full text-white/90 text-xs">Active</span>
+                  <span className="px-3 py-1 bg-white/15 rounded-full text-white/90 text-xs">Experienced</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Flow Diagram */}
+          <div className="mt-6 mb-6 md:mt-8 md:mb-7">
+            <FlowDiagram steps={activeMode === 'managed' ? managedSteps : selfSteps} />
+          </div>
+
+          <p className="text-white/60 text-xs md:text-sm text-center">
+            {activeMode === 'managed'
+              ? 'Your funds are automatically allocated and managed by trusted strategies.'
+              : 'Choose, trade, and manage loan assets directly on-chain.'}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Icons for comparison features
+const LiquidityIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+    <path d="M12 2L12 22M12 2C12 2 8 6 8 12C8 18 12 22 12 22M12 2C12 2 16 6 16 12C16 18 12 22 12 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3" />
+  </svg>
+);
+
+const TransparencyIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+
+const ControlIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+    <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
+
+const AccessIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
+const CustodyIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+    <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// Why Lenders Choose ReFlow Section - Comparison Table
 function WhyLendersSection() {
-  const reasons = [
+  const comparisonData = [
     {
-      title: "Always-On Infrastructure",
-      description: "Your lending doesn't pause for downtime. The chain runs continuously."
+      feature: "Liquidity",
+      icon: LiquidityIcon,
+      traditional: "Locked 6-12 months",
+      reflow: "Exit anytime"
     },
     {
-      title: "On-Chain Transparency",
-      description: "Everything is visible, immutable, and auditable. If it moves, you can track it."
+      feature: "Transparency",
+      icon: TransparencyIcon,
+      traditional: "Platform-reported",
+      reflow: "On-chain"
     },
     {
-      title: "Effortless Growth with Auto-Managed Lending",
-      description: "Let trusted managers grow your lending automatically."
+      feature: "Portfolio Control",
+      icon: ControlIcon,
+      traditional: "Manual",
+      reflow: "Managed or self-managed"
     },
     {
-      title: "Instant Portfolio Insights",
-      description: "Track performance instantly through on-chain data with no delays."
+      feature: "Access",
+      icon: AccessIcon,
+      traditional: "Office hours",
+      reflow: "Always on"
+    },
+    {
+      feature: "Custody",
+      icon: CustodyIcon,
+      traditional: "Platform-held",
+      reflow: "Non-custodial"
     }
   ];
 
-  return (
-    <section className="relative py-14 md:py-20 lg:py-24 overflow-hidden">
-      {/* Background - mostly white with subtle greeny hint spanning across cards */}
-      <div className="absolute inset-0 bg-white" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] md:w-[1100px] h-[150px] bg-[#B1CCD0] rounded-full blur-[80px] opacity-20" />
+  const [isVisible, setIsVisible] = React.useState(false);
+  const sectionRef = React.useRef<HTMLElement>(null);
 
-      <div className="relative z-10">
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="relative py-14 md:py-20 lg:py-24 overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#f8fbfc] via-white to-white" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] md:w-[1100px] h-[200px] bg-[#B1CCD0] rounded-full blur-[100px] opacity-15" />
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Label */}
-        <div className="flex justify-center mb-10 md:mb-14">
+        <div className={`flex justify-center mb-10 md:mb-14 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
           <span className="inline-block px-5 md:px-6 py-2 bg-white text-[#255C9C] rounded-full text-xs md:text-sm font-medium border border-[#255C9C]">
             Why Lenders Choose Reflow?
           </span>
         </div>
 
-        {/* Horizontal Scrolling Cards */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-4 md:gap-6 px-4 sm:px-6 lg:px-8 pb-4 min-w-max md:min-w-0 md:justify-center">
-            {reasons.map((reason, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm min-w-[280px] max-w-[300px] md:min-w-[260px] md:max-w-[280px] flex-shrink-0"
-              >
-                <h3 className="text-lg md:text-xl font-bold text-[#1a1a2e] mb-3 leading-snug text-center">
-                  {reason.title}
-                </h3>
-                <p className="text-gray-500 text-sm leading-relaxed text-center">
-                  {reason.description}
-                </p>
-              </div>
-            ))}
+        {/* Comparison Cards Container */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          {/* Traditional P2P Lending Card */}
+          <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${isVisible ? 'animate-slide-in-left' : 'opacity-0'}`}>
+            <div className="bg-gradient-to-r from-gray-500 to-gray-600 px-6 py-4">
+              <h3 className="text-white font-semibold text-lg text-center">Other Traditional P2P Lending</h3>
+            </div>
+            <div className="p-4 md:p-6">
+              {comparisonData.map((item, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-4 py-4 ${index !== comparisonData.length - 1 ? 'border-b border-gray-100' : ''} ${isVisible ? `animate-fade-in-up comparison-row-${index + 1}` : 'opacity-0'}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
+                    <item.icon />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{item.feature}</p>
+                    <p className="text-gray-600 font-medium">{item.traditional}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Reflow Card - Highlighted */}
+          <div className={`bg-white rounded-2xl shadow-lg border-2 border-[#255C9C]/20 overflow-hidden animate-glow-pulse ${isVisible ? 'animate-slide-in-right' : 'opacity-0'}`}>
+            <div className="bg-gradient-to-r from-[#4A90B8] to-[#255C9C] px-6 py-4">
+              <h3 className="text-white font-semibold text-lg text-center">Reflow</h3>
+            </div>
+            <div className="p-4 md:p-6">
+              {comparisonData.map((item, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-4 py-4 ${index !== comparisonData.length - 1 ? 'border-b border-[#255C9C]/10' : ''} group hover:bg-[#255C9C]/5 rounded-lg transition-colors duration-200 -mx-2 px-2 ${isVisible ? `animate-fade-in-up comparison-row-${index + 1}` : 'opacity-0'}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#79B7D2] to-[#255C9C] flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                    <item.icon />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[#255C9C] uppercase tracking-wide mb-1 font-medium">{item.feature}</p>
+                    <p className="text-[#1a1a2e] font-semibold">{item.reflow}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile View - Merged Table (for smaller screens) */}
+        <div className="lg:hidden mt-8">
+          <div className={`bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[500px]">
+                <thead>
+                  <tr>
+                    <th className="bg-gradient-to-r from-[#4A90B8] to-[#255C9C] text-white py-3 px-4 text-left text-sm font-semibold">Feature</th>
+                    <th className="bg-gray-500 text-white py-3 px-4 text-center text-sm font-semibold">Traditional</th>
+                    <th className="bg-gradient-to-r from-[#4A90B8] to-[#255C9C] text-white py-3 px-4 text-center text-sm font-semibold">Reflow</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonData.map((item, index) => (
+                    <tr key={index} className={`${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-[#255C9C]/5 transition-colors`}>
+                      <td className="py-3 px-4 text-sm font-medium text-[#1a1a2e] flex items-center gap-2">
+                        <span className="text-[#255C9C]"><item.icon /></span>
+                        {item.feature}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-500 text-center">{item.traditional}</td>
+                      <td className="py-3 px-4 text-sm text-[#255C9C] font-semibold text-center">{item.reflow}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -479,6 +751,10 @@ function PartnershipSection() {
                 ReFlow applies Restock.id&apos;s proven processes with on-chain transparency that&apos;s always open and auditable.
               </p>
             </div>
+            {/* OJK Regulation */}
+            <p className="text-gray-600 text-base md:text-lg font-medium">
+              Regulated by OJK (Otoritas Jasa Keuangan)
+            </p>
           </div>
         </div>
       </div>
@@ -566,7 +842,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
           <p className="text-white/80 text-xs md:text-sm">
-            © 2024 ReFlow. All rights reserved.
+            © 2025 ReFlow. All rights reserved.
           </p>
           <div className="flex items-center gap-4 md:gap-6">
             <Link href="#" className="text-white/80 hover:text-white text-xs md:text-sm transition-colors">
@@ -589,6 +865,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <WhatIsReFlowSection />
+      <ManagersMarquee />
       <KeyFeaturesSection />
       <WhyLendersSection />
       <PartnershipSection />
