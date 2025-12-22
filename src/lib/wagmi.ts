@@ -24,11 +24,13 @@ export const mantleSepolia = defineChain({
   testnet: true,
 });
 
-// 2. Transports per chain (recommended)
+// 2. Transports per chain (recommended) - Using Alchemy RPC
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+
 const transports = {
-  [mantleSepolia.id]: http('https://rpc.sepolia.mantle.xyz'),
-  [baseSepolia.id]: http('https://sepolia.base.org'),
-  [sepolia.id]: http('https://rpc.sepolia.org'),
+  [mantleSepolia.id]: http(`https://mantle-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+  [baseSepolia.id]: http(`https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+  [sepolia.id]: http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
 };
 
 // 3. RainbowKit + Wagmi Config

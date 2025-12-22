@@ -145,9 +145,12 @@ function Navbar() {
             <Link href="#contact" className="text-gray-600 hover:text-[#0A6A74] transition-colors text-sm font-medium">
               Contact
             </Link>
-            <button disabled className="text-gray-400 cursor-not-allowed text-sm font-medium">
-              Register
-            </button>
+            <Link
+              href="/faucet"
+              className="px-4 py-1.5 bg-gradient-to-r from-[#79B7D2] to-[#255C9C] text-white rounded-full text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all"
+            >
+              Faucet
+            </Link>
           </div>
 
           {/* CTA Button - Connect Wallet */}
@@ -352,52 +355,231 @@ function ManagersMarquee() {
 }
 
 // Simple Flow Diagram with numbered nodes
-const FlowDiagram = ({ steps }: { steps: string[] }) => (
-  <svg viewBox="0 0 500 95" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
-    {/* Curved connecting paths */}
-    <path
-      d="M60 25 Q100 25 115 35 Q130 50 160 50"
-      fill="none"
-      stroke="rgba(255,255,255,0.3)"
-      strokeWidth="2"
-      strokeDasharray="5 4"
-    />
-    <path
-      d="M200 50 Q230 50 245 35 Q260 20 290 20"
-      fill="none"
-      stroke="rgba(255,255,255,0.3)"
-      strokeWidth="2"
-      strokeDasharray="5 4"
-    />
-    <path
-      d="M330 20 Q360 20 375 35 Q390 50 420 50"
-      fill="none"
-      stroke="rgba(255,255,255,0.3)"
-      strokeWidth="2"
-      strokeDasharray="5 4"
-    />
+const FlowDiagram = ({ steps }: { steps: string[] }) => {
+  const pathRef = React.useRef<SVGPathElement>(null);
+  const [dotPosition, setDotPosition] = React.useState({ x: 50, y: 25 });
+  const [activeStep, setActiveStep] = React.useState(1);
+  const [isAnimating, setIsAnimating] = React.useState(true);
 
-    {/* Node 1 */}
-    <circle cx="50" cy="25" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-    <text x="50" y="30" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">1</text>
-    <text x="50" y="53" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[0]}</text>
+  // Animation timing
+  const stepDuration = 1500; // 1.5 seconds per step (slower)
+  const pauseDuration = 1000; // 1 second pause at end before restart
 
-    {/* Node 2 */}
-    <circle cx="180" cy="50" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-    <text x="180" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">2</text>
-    <text x="180" y="78" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[1]}</text>
+  React.useEffect(() => {
+    const path = pathRef.current;
+    if (!path) return;
 
-    {/* Node 3 */}
-    <circle cx="310" cy="20" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-    <text x="310" y="25" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">3</text>
-    <text x="310" y="48" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[2]}</text>
+    const totalLength = path.getTotalLength();
+    const segmentLength = totalLength / 3; // 3 segments between 4 nodes
 
-    {/* Node 4 */}
-    <circle cx="440" cy="50" r="14" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
-    <text x="440" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="500">4</text>
-    <text x="440" y="78" textAnchor="middle" fill="white" fontSize="9" opacity="0.7">{steps[3]}</text>
-  </svg>
-);
+    let animationId: number;
+    let startTime: number | null = null;
+    let isPaused = false;
+    let pauseStartTime: number | null = null;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+
+      // Handle pause at end of cycle
+      if (isPaused) {
+        if (!pauseStartTime) pauseStartTime = timestamp;
+        const pauseElapsed = timestamp - pauseStartTime;
+
+        if (pauseElapsed >= pauseDuration) {
+          // Reset for new cycle
+          isPaused = false;
+          pauseStartTime = null;
+          startTime = timestamp;
+          setActiveStep(1);
+          setDotPosition({ x: 50, y: 25 });
+        }
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const elapsed = timestamp - startTime;
+      const totalAnimDuration = stepDuration * 3; // Time to travel all 3 segments
+
+      if (elapsed >= totalAnimDuration) {
+        // Reached end, start pause
+        isPaused = true;
+        setActiveStep(4);
+        const endPoint = path.getPointAtLength(totalLength);
+        setDotPosition({ x: endPoint.x, y: endPoint.y });
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Calculate current position along path
+      const progress = elapsed / totalAnimDuration;
+      const currentLength = progress * totalLength;
+      const point = path.getPointAtLength(currentLength);
+      setDotPosition({ x: point.x, y: point.y });
+
+      // Determine which step based on position
+      const currentSegment = Math.floor(currentLength / segmentLength);
+      const newStep = Math.min(currentSegment + 1, 4);
+
+      // Only update step when dot ARRIVES at node (at segment boundaries)
+      const progressInSegment = (currentLength % segmentLength) / segmentLength;
+      if (progressInSegment > 0.95 || currentSegment >= 3) {
+        setActiveStep(Math.min(currentSegment + 2, 4));
+      } else {
+        setActiveStep(newStep);
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  return (
+    <svg viewBox="0 0 500 95" className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        {/* Glow filter for active elements */}
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        {/* Dot glow filter */}
+        <filter id="dotGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Hidden path for getPointAtLength calculation */}
+      <path
+        ref={pathRef}
+        d="M50 25 Q100 25 115 40 Q130 50 180 50 Q230 50 245 35 Q260 20 310 20 Q360 20 375 35 Q390 50 440 50"
+        fill="none"
+        stroke="transparent"
+      />
+
+      {/* Static background paths */}
+      <path
+        d="M64 25 Q100 25 115 40 Q130 50 166 50"
+        fill="none"
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+      />
+      <path
+        d="M194 50 Q230 50 245 35 Q260 20 296 20"
+        fill="none"
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+      />
+      <path
+        d="M324 20 Q360 20 375 35 Q390 50 426 50"
+        fill="none"
+        stroke="rgba(255,255,255,0.15)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+      />
+
+      {/* Animated path traces - light up when dot passes */}
+      <path
+        d="M64 25 Q100 25 115 40 Q130 50 166 50"
+        fill="none"
+        stroke="rgba(255,255,255,0.6)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+        className="animate-flow-path"
+        style={{ opacity: activeStep >= 2 ? 1 : 0, transition: 'opacity 0.3s' }}
+      />
+      <path
+        d="M194 50 Q230 50 245 35 Q260 20 296 20"
+        fill="none"
+        stroke="rgba(255,255,255,0.6)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+        className="animate-flow-path"
+        style={{ opacity: activeStep >= 3 ? 1 : 0, transition: 'opacity 0.3s' }}
+      />
+      <path
+        d="M324 20 Q360 20 375 35 Q390 50 426 50"
+        fill="none"
+        stroke="rgba(255,255,255,0.6)"
+        strokeWidth="2"
+        strokeDasharray="4 4"
+        className="animate-flow-path"
+        style={{ opacity: activeStep >= 4 ? 1 : 0, transition: 'opacity 0.3s' }}
+      />
+
+      {/* Traveling dot - position controlled by JS */}
+      <circle
+        cx={dotPosition.x}
+        cy={dotPosition.y}
+        r="5"
+        fill="white"
+        filter="url(#dotGlow)"
+      />
+
+      {/* Node 1 */}
+      <g style={{ filter: activeStep >= 1 ? 'url(#glow)' : 'none' }}>
+        <circle
+          cx="50" cy="25" r="14"
+          fill={activeStep >= 1 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)"}
+          stroke={activeStep >= 1 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)"}
+          strokeWidth="1.5"
+          style={{ transition: 'all 0.3s' }}
+        />
+        <text x="50" y="30" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">1</text>
+        <text x="50" y="53" textAnchor="middle" fill="white" fontSize="9" opacity={activeStep >= 1 ? 1 : 0.5}>{steps[0]}</text>
+      </g>
+
+      {/* Node 2 */}
+      <g style={{ filter: activeStep >= 2 ? 'url(#glow)' : 'none' }}>
+        <circle
+          cx="180" cy="50" r="14"
+          fill={activeStep >= 2 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)"}
+          stroke={activeStep >= 2 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)"}
+          strokeWidth="1.5"
+          style={{ transition: 'all 0.3s' }}
+        />
+        <text x="180" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">2</text>
+        <text x="180" y="78" textAnchor="middle" fill="white" fontSize="9" opacity={activeStep >= 2 ? 1 : 0.5}>{steps[1]}</text>
+      </g>
+
+      {/* Node 3 */}
+      <g style={{ filter: activeStep >= 3 ? 'url(#glow)' : 'none' }}>
+        <circle
+          cx="310" cy="20" r="14"
+          fill={activeStep >= 3 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)"}
+          stroke={activeStep >= 3 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)"}
+          strokeWidth="1.5"
+          style={{ transition: 'all 0.3s' }}
+        />
+        <text x="310" y="25" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">3</text>
+        <text x="310" y="48" textAnchor="middle" fill="white" fontSize="9" opacity={activeStep >= 3 ? 1 : 0.5}>{steps[2]}</text>
+      </g>
+
+      {/* Node 4 */}
+      <g style={{ filter: activeStep >= 4 ? 'url(#glow)' : 'none' }}>
+        <circle
+          cx="440" cy="50" r="14"
+          fill={activeStep >= 4 ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)"}
+          stroke={activeStep >= 4 ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)"}
+          strokeWidth="1.5"
+          style={{ transition: 'all 0.3s' }}
+        />
+        <text x="440" y="55" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">4</text>
+        <text x="440" y="78" textAnchor="middle" fill="white" fontSize="9" opacity={activeStep >= 4 ? 1 : 0.5}>{steps[3]}</text>
+      </g>
+    </svg>
+  );
+};
 
 // Key Features Section - Stacked Cards (Slide & Fade)
 function KeyFeaturesSection() {

@@ -1,67 +1,125 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight, ChevronDown, Users, Wallet, Sprout, Fish, TreePine, AlertCircle } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
+import { ChevronRight, ChevronDown, Users, Wallet, Loader2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useDeployedManagers } from '@/hooks/useAutoManage';
-import { managerMetadata, defaultManagerMetadata, formatAUM, getRiskColor, getCategoryColor } from '@/lib/constants/manager-metadata';
+import Image from 'next/image';
+import { fetchManagerList, ManagerItem } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+
+const getRiskColor = (riskLevel: string | null) => {
+  if (!riskLevel) return 'border-gray-400 text-gray-500 bg-gray-50 dark:bg-gray-900/20';
+
+  const level = riskLevel.toLowerCase();
+  if (level.includes('high')) {
+    return 'border-red-400 text-red-500 bg-red-50 dark:bg-red-900/20';
+  } else if (level.includes('medium')) {
+    return 'border-orange-400 text-orange-500 bg-orange-50 dark:bg-orange-900/20';
+  } else if (level.includes('low')) {
+    return 'border-green-400 text-green-500 bg-green-50 dark:bg-green-900/20';
+  }
+  return 'border-gray-400 text-gray-500 bg-gray-50 dark:bg-gray-900/20';
+};
+
+const formatRiskLevel = (riskLevel: string | null): string => {
+  if (!riskLevel) return 'Unknown Risk';
+  const level = riskLevel.toLowerCase();
+  if (level.includes('high')) return 'High Risk';
+  if (level.includes('medium')) return 'Medium Risk';
+  if (level.includes('low')) return 'Low Risk';
+  return riskLevel;
+};
+
+const MANAGER_LOGOS: Record<string, string> = {
+  'BNI AM': '/images/logo-BNI.png',
+  'MANDIRI MI': '/images/logo-MANDIRI.png',
+  'Mandiri MI': '/images/logo-MANDIRI.png',
+  'BRI MI': '/images/logo-BRI.png',
+};
+
+const formatCurrency = (value: string | null): string => {
+  if (!value) return '$0';
+  const num = parseFloat(value);
+  if (isNaN(num)) return '$0';
+
+  if (num >= 1000000) {
+    return `$${(num / 1000000).toFixed(1)}M`;
+  } else if (num >= 1000) {
+    return `$${(num / 1000).toFixed(0)}K`;
+  }
+  return `$${num.toFixed(0)}`;
+};
 
 export default function AutoManagePage() {
   const router = useRouter();
-  const { managers: onChainManagers, isLoading } = useDeployedManagers();
+  const [managers, setManagers] = useState<ManagerItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Combine on-chain data with off-chain metadata
-  const managers = onChainManagers.map((manager) => {
-    const addressLower = manager.address.toLowerCase();
-    const metadata = managerMetadata[addressLower] || defaultManagerMetadata;
+  // Fetch manager data on component mount
+  useEffect(() => {
+    const loadManagerData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchManagerList();
 
-    return {
-      id: manager.address,
-      name: metadata.displayName || manager.name, // Use displayName if available, fallback to on-chain name
-      address: manager.address,
-      owner: manager.owner,
-      avatar: metadata.avatar,
-      riskLevel: metadata.riskLevel,
-      maxProfit: metadata.maxProfit,
-      experience: metadata.experience,
-      totalAUM: formatAUM(manager.totalDeposits),
-      totalInvestors: 0, // Would need to track this separately
-      products: metadata.products,
+        // Sort managers by risk level: Low → Medium → High
+        const sortedData = data.sort((a, b) => {
+          const getRiskValue = (riskLevel: string | null): number => {
+            if (!riskLevel) return 999; // Put unknown risk at the end
+            const level = riskLevel.toLowerCase();
+            if (level.includes('low')) return 1;
+            if (level.includes('medium')) return 2;
+            if (level.includes('high')) return 3;
+            return 999; // Unknown risk levels at the end
+          };
+
+          return getRiskValue(a.riskLevel) - getRiskValue(b.riskLevel);
+        });
+
+        setManagers(sortedData);
+      } catch (err) {
+        console.error('Error loading manager data:', err);
+        setError('Failed to load manager data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     };
-  });
 
-  if (isLoading) {
+    loadManagerData();
+  }, []);
+
+  // Loading state
+  if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[#225B3A]">Auto Manage</h1>
-          <p className="text-muted-foreground mt-1">
-            Choose a manager to handle your portfolio automatically
-          </p>
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-2">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-6">
-                  <Skeleton className="w-24 h-24 rounded-lg" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-6 w-32" />
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-4 w-36" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Loading manager data...</p>
         </div>
       </div>
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
+          <p className="text-destructive font-medium">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
   if (managers.length === 0) {
     return (
       <div className="space-y-6">
@@ -71,15 +129,11 @@ export default function AutoManagePage() {
             Choose a manager to handle your portfolio automatically
           </p>
         </div>
-        <Card className="border-2 border-dashed">
-          <CardContent className="p-12 text-center">
-            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Managers Available</h3>
-            <p className="text-muted-foreground">
-              There are no investment managers deployed yet. Check back later.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground">No managers available at the moment.</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -105,16 +159,25 @@ export default function AutoManagePage() {
             <CardContent className="p-0">
               {/* Main Card Content */}
               <div className="flex items-center gap-6 p-6">
-                {/* Avatar */}
-                <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-muted">
-                  <Image
-                    src={manager.avatar}
-                    alt={manager.name}
-                    width={96}
-                    height={96}
-                    className="object-cover w-full h-full"
-                    unoptimized
-                  />
+                {/* Avatar Placeholder */}
+                {/* Avatar / Logo */}
+                <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-white border border-gray-100 flex items-center justify-center p-2">
+                  {MANAGER_LOGOS[manager.name] ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={MANAGER_LOGOS[manager.name]}
+                        alt={`${manager.name} Logo`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center rounded-lg">
+                      <span className="text-3xl font-bold text-white">
+                        {manager.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}
@@ -125,24 +188,32 @@ export default function AutoManagePage() {
                       variant="outline"
                       className={`${getRiskColor(manager.riskLevel)} font-medium`}
                     >
-                      {manager.riskLevel}
+                      {formatRiskLevel(manager.riskLevel)}
                     </Badge>
                   </div>
 
                   <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
                     <p className="text-muted-foreground">
-                      Max profit: <span className="font-semibold text-foreground">{manager.maxProfit}</span>
+                      Max profit: <span className="font-semibold text-foreground">
+                        {manager.maxProfitLAPY ? `${parseFloat(manager.maxProfitLAPY).toFixed(2)}%` : 'N/A'}
+                      </span>
                     </p>
                     <p className="text-muted-foreground">
-                      Experience: <span className="font-semibold text-foreground">{manager.experience}</span>
+                      Experience: <span className="font-semibold text-foreground">
+                        {manager.experienceYears ? `${manager.experienceYears} years` : 'N/A'}
+                      </span>
                     </p>
                     <p className="text-muted-foreground flex items-center gap-1">
                       <Wallet className="h-3.5 w-3.5" />
-                      AUM: <span className="font-semibold text-foreground">{manager.totalAUM}</span>
+                      AUM: <span className="font-semibold text-foreground">
+                        {formatCurrency(manager.assetUnderManagement)}
+                      </span>
                     </p>
                     <p className="text-muted-foreground flex items-center gap-1">
                       <Users className="h-3.5 w-3.5" />
-                      Investors: <span className="font-semibold text-foreground">{manager.totalInvestors}</span>
+                      Investors: <span className="font-semibold text-foreground">
+                        {manager.totalClients || 0}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -155,26 +226,28 @@ export default function AutoManagePage() {
                 </div>
               </div>
 
-              {/* Hover Dropdown - Products Handled */}
+              {/* Hover Dropdown - Manager Details */}
               <div className="max-h-0 group-hover:max-h-48 overflow-hidden transition-all duration-300 ease-in-out">
                 <div className="border-t bg-muted/30 px-6 py-4">
                   <div className="flex items-center gap-2 mb-3">
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-muted-foreground">Products Handled</span>
+                    <span className="text-sm font-medium text-muted-foreground">Manager Details</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {manager.products.map((product, index) => {
-                      const ProductIcon = product.icon;
-                      return (
-                        <div
-                          key={index}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${getCategoryColor(product.category)}`}
-                        >
-                          <ProductIcon className="h-3.5 w-3.5" />
-                          <span>{product.name}</span>
-                        </div>
-                      );
-                    })}
+                  <div className="space-y-2 text-sm">
+                    {manager.description && (
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">Description:</span> {manager.description}
+                      </p>
+                    )}
+                    {manager.strategy && (
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">Strategy:</span> {manager.strategy}
+                      </p>
+                    )}
+                    <p className="text-muted-foreground">
+                      <span className="font-medium">Contract:</span>{' '}
+                      <span className="font-mono text-xs">{manager.contractAddress}</span>
+                    </p>
                   </div>
                 </div>
               </div>
