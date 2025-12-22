@@ -62,6 +62,8 @@ export default function PortfolioPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
+
+        {/* Portofolio Value */}
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Total Portfolio Value</CardDescription>
@@ -76,6 +78,8 @@ export default function PortfolioPage() {
             )}
           </CardHeader>
         </Card>
+
+        {/* USDT Balance */}
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>USDT Balance</CardDescription>
@@ -90,6 +94,8 @@ export default function PortfolioPage() {
             )}
           </CardHeader>
         </Card>
+
+        {/* Total Invested */}
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Total Invested</CardDescription>
@@ -104,6 +110,8 @@ export default function PortfolioPage() {
             )}
           </CardHeader>
         </Card>
+
+        {/* Active Assets */}
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Active Assets</CardDescription>

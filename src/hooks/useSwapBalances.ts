@@ -28,7 +28,7 @@ export function useSwapBalance({ tokenAddress, isUSDT = false }: UseSwapBalances
         },
     });
 
-    // Format balance
+    // Format balance (using 6 decimals for USDT-backed tokens)
     const formattedBalance = balance
         ? parseFloat(formatUnits(balance as bigint, 6))
         : 0;
