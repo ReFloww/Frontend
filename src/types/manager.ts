@@ -1,6 +1,6 @@
 /**
  * Manager Types
- * Types for manager data from the auto-manage API
+ * Types for manager data from the investment-funds API
  */
 
 export interface ManagerItem {
@@ -13,6 +13,9 @@ export interface ManagerItem {
     createdAt: string;
     createdAtBlock: string;
     totalFundsManaged: string;
+    lockedFundValue: string;
+    liquidFundValue: string;
+    sharePrice: string;
 
     // Metadata
     description: string | null;

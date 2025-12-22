@@ -33,6 +33,9 @@ export interface ManagerItem {
     createdAt: string;
     createdAtBlock: string;
     totalFundsManaged: string;
+    lockedFundValue: string;
+    liquidFundValue: string;
+    sharePrice: string;
 
     // Metadata
     description: string | null;
@@ -74,7 +77,7 @@ export async function fetchMarketList(): Promise<MarketItem[]> {
  */
 export async function fetchManagerList(): Promise<ManagerItem[]> {
     try {
-        const response = await fetch(`${API_BASE_URL}/auto-manage/list`, {
+        const response = await fetch(`${API_BASE_URL}/investment-funds/list`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -99,7 +102,7 @@ export async function fetchManagerList(): Promise<ManagerItem[]> {
  */
 export async function fetchManagerById(id: string): Promise<ManagerItem> {
     try {
-        const response = await fetch(`${API_BASE_URL}/auto-manage/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/investment-funds/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
