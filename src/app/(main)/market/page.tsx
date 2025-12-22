@@ -164,7 +164,7 @@ export default function MarketPage() {
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Contract ID</span>
                         <a
-                          href={`https://sepolia.basescan.org/address/${product.contractId}`}
+                          href={`https://sepolia.mantlescan.xyz/address/${product.contractId}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-xs font-mono text-foreground hover:underline hover:text-primary z-10 flex items-center gap-1"
