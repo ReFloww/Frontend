@@ -23,7 +23,7 @@ interface TokenSelectionDialogProps {
   title: string;
   description: string;
   tokens: Token[];
-  selectedToken: Token;
+  selectedToken: Token | null;
   disabledTokenId?: string;
   onSelect: (token: Token) => void;
 }
@@ -70,7 +70,7 @@ export default function TokenSelectionDialog({
                   <div className="font-semibold">{token.ticker}</div>
                   <div className="text-sm text-muted-foreground">{token.name}</div>
                 </div>
-                {selectedToken.id === token.id && (
+                {selectedToken?.id === token.id && (
                   <div className="w-2 h-2 rounded-full bg-[#225B3A]" />
                 )}
                 {isDisabled && (

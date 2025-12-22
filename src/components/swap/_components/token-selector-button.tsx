@@ -13,7 +13,7 @@ interface Token {
 }
 
 interface TokenSelectorButtonProps {
-  token: Token;
+  token: Token | null;
   onClick: () => void;
 }
 
@@ -24,13 +24,19 @@ export default function TokenSelectorButton({ token, onClick }: TokenSelectorBut
       onClick={onClick}
       className="flex items-center gap-2 h-12 px-4 shrink-0 ml-3 rounded-xl hover:bg-muted/50 transition-all cursor-pointer"
     >
-      <div
-        className="w-7 h-7 rounded-full flex items-center justify-center"
-        style={{ backgroundColor: `${token.color}20` }}
-      >
-        <token.icon className="h-4 w-4" style={{ color: token.color }} />
-      </div>
-      <span className="font-semibold">{token.ticker}</span>
+      {token ? (
+        <>
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: `${token.color}20` }}
+          >
+            <token.icon className="h-4 w-4" style={{ color: token.color }} />
+          </div>
+          <span className="font-semibold">{token.ticker}</span>
+        </>
+      ) : (
+        <span className="text-muted-foreground">Select Token</span>
+      )}
       <ChevronDown className="h-4 w-4" />
     </Button>
   );
