@@ -230,8 +230,10 @@ export default function ProductDetailPage() {
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors w-fit"
                                     >
-                                        <p className="text-sm font-mono text-gray-500">{product.tokenP2PAddress}</p>
-                                        <ArrowUpRight className="h-4 w-4 text-gray-500" />
+                                        <p className="text-base font-medium font-mono">
+                                            {product.tokenP2PAddress.slice(0, 5)}...{product.tokenP2PAddress.slice(-3)}
+                                        </p>
+                                        <ArrowUpRight className="h-4 w-4" />
                                     </a>
                                 </div>
                                 <div>
