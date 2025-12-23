@@ -4,7 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Bot, User } from 'lucide-react';
+import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Bot, User, Droplet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -77,10 +77,19 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Connect Button on the Left */}
+            {/* Faucet Button */}
+            <Link
+              href="/faucet"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#79B7D2] to-[#255C9C] px-4 py-2 text-white hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              <Droplet className="h-4 w-4" />
+              <span className="text-sm font-medium">Faucet</span>
+            </Link>
+
+            {/* Connect Button */}
             <ConnectButton />
 
-            {/* Profile Link on the Right */}
+            {/* Profile Link */}
             <Link href="/profile" className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer">
               <User className="h-5 w-5" />
               <span className="text-sm font-medium">Profile</span>

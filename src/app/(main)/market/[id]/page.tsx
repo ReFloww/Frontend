@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Loader2, AlertCircle, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Loader2, AlertCircle, Sprout, Fish, TreePine } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TradeCard from '@/components/market/trade-card';
@@ -12,7 +12,6 @@ import ProductInformation from '@/components/market/product-information';
 import { getCreditRatingColor } from '@/lib/constants/product-market';
 import { fetchMarketItemById, MarketItem } from '@/lib/api';
 import { TokenizedProduct } from '@/types/product-market';
-import { Sprout, Fish, TreePine } from 'lucide-react';
 
 // Icon mapping based on category
 const getCategoryIcon = (category: string | null | undefined) => {
@@ -28,6 +27,24 @@ const getCategoryIcon = (category: string | null | undefined) => {
             return Sprout;
     }
 };
+
+// Convert API response to TokenizedProduct format
+const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
+    id: item.id,
+    productName: item.name,
+    symbol: item.symbol,
+    categoryId: item.categoryId as 'Agriculture' | 'Fisheries' | 'Forestry',
+    description: item.description,
+    loanInterest: parseFloat(item.loanInterest),
+    loanAmount: parseFloat(item.loanAmount),
+    loanTenor: item.loanTenor,
+    creditRate: item.creditRate as 'A' | 'B' | 'C',
+    contractId: item.contractAddress,
+    tokenP2PAddress: item.contractAddress as `0x${string}`,
+    holderCount: parseInt(item.holderCount) || 0,
+    status: item.status,
+    icon: getCategoryIcon(item.categoryId),
+});
 
 interface LoanCalculation {
     monthlyPrincipal: number;
@@ -51,43 +68,24 @@ export default function ProductDetailPage() {
     const [investmentAmount, setInvestmentAmount] = useState<string>('');
     const [calculation, setCalculation] = useState<LoanCalculation | null>(null);
 
+    // Fetch product data on component mount
     useEffect(() => {
         const loadProduct = async () => {
             try {
                 setLoading(true);
                 setError(null);
                 const data = await fetchMarketItemById(productId);
-
-                // Map API response to TokenizedProduct
-                const mappedProduct: TokenizedProduct = {
-                    id: data.id,
-                    productName: data.name,
-                    symbol: data.symbol,
-                    categoryId: data.categoryId as 'Agriculture' | 'Fisheries' | 'Forestry',
-                    description: data.description,
-                    loanInterest: parseFloat(data.loanInterest),
-                    loanAmount: parseFloat(data.loanAmount),
-                    loanTenor: data.loanTenor,
-                    creditRate: data.creditRate as 'A' | 'B' | 'C',
-                    contractId: data.contractAddress,
-                    tokenP2PAddress: data.contractAddress as `0x${string}`,
-                    holderCount: parseInt(data.holderCount) || 0,
-                    status: data.status,
-                    icon: getCategoryIcon(data.categoryId),
-                };
-
+                const mappedProduct = mapApiToProduct(data);
                 setProduct(mappedProduct);
             } catch (err) {
                 console.error('Error loading product:', err);
-                setError('Failed to load product details.');
+                setError('Failed to load product details. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
 
-        if (productId) {
-            loadProduct();
-        }
+        loadProduct();
     }, [productId]);
 
     const calculateReturns = (amount: number) => {
@@ -128,23 +126,42 @@ export default function ProductDetailPage() {
         }
     };
 
+    // Loading state
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                    <p className="text-muted-foreground">Loading product details...</p>
+                </div>
             </div>
         );
     }
 
-    if (error || !product) {
+    // Error state
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center space-y-4">
+                    <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
+                    <p className="text-destructive font-medium">{error}</p>
+                    <Button onClick={() => window.location.reload()} variant="outline">
+                        Retry
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // Product not found state
+    if (!product) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <Card>
                     <CardContent className="flex flex-col items-center justify-center py-16">
-                        <AlertCircle className="h-12 w-12 text-destructive mb-4" />
                         <h3 className="mb-2 text-lg font-semibold">Product Not Found</h3>
                         <p className="mb-6 text-center text-sm text-muted-foreground">
-                            {error || 'The requested tokenized product could not be found'}
+                            The requested tokenized product could not be found
                         </p>
                         <Button onClick={() => router.push('/market')}>
                             Back to Market

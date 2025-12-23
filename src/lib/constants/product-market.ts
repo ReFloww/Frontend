@@ -1,6 +1,9 @@
 import { Sprout, Fish, TreePine } from 'lucide-react';
 import { TokenizedProduct } from '@/types/product-market';
 
+// Re-export as Product for compatibility with market components
+export type Product = TokenizedProduct;
+
 /**
  * Tokenized Product Market Data
  * Each product has its own unique P2P token contract address
@@ -18,6 +21,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'A',
     contractId: 'contract-uuid-1',
     tokenP2PAddress: '0x6A3beA365C43c5eC0337f10C0dbD748d39120030',
+    holderCount: 0,
+    status: 'active',
     icon: Sprout,
   },
   {
@@ -32,6 +37,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'B',
     contractId: 'contract-uuid-2',
     tokenP2PAddress: '0x3db507Ce55B0d9DC29045916Fb36efc4d13be4DB',
+    holderCount: 0,
+    status: 'active',
     icon: Fish,
   },
   {
@@ -46,6 +53,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'A',
     contractId: 'contract-uuid-3',
     tokenP2PAddress: '0x59cA3aa58e5Daa439B00Ce827FE017C5C572c7BB',
+    holderCount: 0,
+    status: 'active',
     icon: TreePine,
   },
   {
@@ -60,6 +69,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'A',
     contractId: 'contract-uuid-4',
     tokenP2PAddress: '0x160aA9041Bbb55D424f4C06617cfB907F56AC262',
+    holderCount: 0,
+    status: 'active',
     icon: Sprout,
   },
   {
@@ -74,6 +85,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'B',
     contractId: 'contract-uuid-5',
     tokenP2PAddress: '0xf9e7863E3f7637feb86Cb6bC5bfF922009e1487C',
+    holderCount: 0,
+    status: 'active',
     icon: Fish,
   },
   {
@@ -88,6 +101,8 @@ export const PRODUCT_MARKET: TokenizedProduct[] = [
     creditRate: 'C',
     contractId: 'contract-uuid-6',
     tokenP2PAddress: '0x81d0c239C9E25Ba1Ca5475E95Fe31292168e03Eb',
+    holderCount: 0,
+    status: 'active',
     icon: TreePine,
   },
 ];

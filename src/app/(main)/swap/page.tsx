@@ -1,13 +1,8 @@
 'use client';
 
 import SwapCard from '@/components/swap/swap-card';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 
-function SwapContent() {
-  const searchParams = useSearchParams();
-  const initialSellTokenId = searchParams.get('sellToken');
-
+export default function SwapPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -17,16 +12,8 @@ function SwapContent() {
 
       {/* Swap Interface */}
       <div className="max-w-xl mx-auto">
-        <SwapCard initialSellTokenId={initialSellTokenId} />
+        <SwapCard />
       </div>
     </div>
-  );
-}
-
-export default function SwapPage() {
-  return (
-    <Suspense fallback={<div className="text-center py-12">Loading...</div>}>
-      <SwapContent />
-    </Suspense>
   );
 }
