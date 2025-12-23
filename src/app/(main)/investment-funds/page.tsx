@@ -52,7 +52,15 @@ const formatCurrency = (value: string | null): string => {
   return `$${num.toFixed(0)}`;
 };
 
-export default function AutoManagePage() {
+const formatScaledValue = (value: string | null): string => {
+  if (!value) return '$0';
+  const num = parseFloat(value);
+  if (isNaN(num)) return '$0';
+  const scaledNum = num / 1000000;
+  return formatCurrency(scaledNum.toString());
+};
+
+export default function InvestmentFundsPage() {
   const router = useRouter();
   const [managers, setManagers] = useState<ManagerItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +132,7 @@ export default function AutoManagePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#225B3A]">Auto Manage</h1>
+          <h1 className="text-3xl font-bold text-[#225B3A]">Investment Funds</h1>
           <p className="text-muted-foreground mt-1">
             Choose a manager to handle your portfolio automatically
           </p>
@@ -142,7 +150,7 @@ export default function AutoManagePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#225B3A]">Auto Manage</h1>
+        <h1 className="text-3xl font-bold text-[#225B3A]">Investment Funds</h1>
         <p className="text-muted-foreground mt-1">
           Choose a manager to handle your portfolio automatically
         </p>
@@ -154,7 +162,7 @@ export default function AutoManagePage() {
           <Card
             key={manager.id}
             className="border-2 hover:border-[#225B3A]/50 transition-all cursor-pointer group overflow-hidden"
-            onClick={() => router.push(`/auto-manage/${manager.id}`)}
+            onClick={() => router.push(`/investment-funds/${manager.id}`)}
           >
             <CardContent className="p-0">
               {/* Main Card Content */}
@@ -206,7 +214,7 @@ export default function AutoManagePage() {
                     <p className="text-muted-foreground flex items-center gap-1">
                       <Wallet className="h-3.5 w-3.5" />
                       AUM: <span className="font-semibold text-foreground">
-                        {formatCurrency(manager.assetUnderManagement)}
+                        {formatScaledValue(manager.totalFundsManaged)}
                       </span>
                     </p>
                     <p className="text-muted-foreground flex items-center gap-1">

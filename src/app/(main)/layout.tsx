@@ -11,7 +11,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Market', href: '/market', icon: TrendingUp },
-  { name: 'Auto Manage', href: '/auto-manage', icon: Bot },
+  { name: 'Investment Funds', href: '/investment-funds', icon: Bot },
   { name: 'History', href: '/history', icon: History },
   { name: 'Settings', href: '/settings', icon: Settings },
   // { name: 'Profile', href: '/profile', icon: User },

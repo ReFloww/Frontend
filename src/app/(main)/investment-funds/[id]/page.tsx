@@ -13,7 +13,8 @@ import {
     Loader2,
     AlertCircle,
     TrendingUp,
-    Unlock
+    Unlock,
+    ExternalLink
 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
@@ -63,6 +64,28 @@ const formatCurrency = (value: string | null): string => {
     return `$${num.toFixed(0)}`;
 };
 
+const formatScaledValue = (value: string | null): string => {
+    if (!value) return '$0';
+    const num = parseFloat(value);
+    if (isNaN(num)) return '$0';
+    const scaledNum = num / 1000000;
+    return formatCurrency(scaledNum.toString());
+};
+
+const formatSharePrice = (value: string | null): string => {
+    if (!value) return '$0.00';
+    const num = parseFloat(value);
+    if (isNaN(num)) return '$0.00';
+    const scaledNum = num / 1000000;
+
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(scaledNum);
+};
+
 export default function ManagerDetailPage() {
     const router = useRouter();
     const params = useParams();
@@ -72,9 +95,9 @@ export default function ManagerDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Mock data for invested and liquidable assets (consistent with chart data - July 2025)
-    const mockInvestedAssets = 850000;  // $850K - matches chart's latest investment value
-    const mockLiquidableAssets = 260000; // $260K - matches chart's latest liquidity value
+    // Mock data removed in favor of real data from API
+    // const mockInvestedAssets = 850000;
+    // const mockLiquidableAssets = 260000;
 
     useEffect(() => {
         const loadManagerDetail = async () => {
@@ -110,18 +133,18 @@ export default function ManagerDetailPage() {
             <div className="space-y-6">
                 <Button
                     variant="ghost"
-                    onClick={() => router.push('/auto-manage')}
+                    onClick={() => router.push('/investment-funds')}
                     className="hover:scale-105 transition-transform cursor-pointer"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Auto Manage
+                    Back to Investment Funds
                 </Button>
                 <div className="flex items-center justify-center min-h-[400px]">
                     <div className="text-center space-y-4">
                         <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
                         <p className="text-destructive font-medium">{error || 'Manager not found'}</p>
-                        <Button onClick={() => router.push('/auto-manage')} variant="outline">
-                            Back to Auto Manage
+                        <Button onClick={() => router.push('/investment-funds')} variant="outline">
+                            Back to Investment Funds
                         </Button>
                     </div>
                 </div>
@@ -133,11 +156,11 @@ export default function ManagerDetailPage() {
         <div className="space-y-6">
             <Button
                 variant="ghost"
-                onClick={() => router.push('/auto-manage')}
+                onClick={() => router.push('/investment-funds')}
                 className="hover:scale-105 transition-transform cursor-pointer"
             >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Auto Manage
+                Back to Investment Funds
             </Button>
 
             <div className="grid gap-6 lg:grid-cols-3">
@@ -172,10 +195,9 @@ export default function ManagerDetailPage() {
                                     </div>
                                     <div className="flex items-baseline gap-3">
                                         <span className="text-3xl font-bold text-[#0A6A74]">
-                                            {formatCurrency(manager.assetUnderManagement)}
+                                            {formatSharePrice(manager.sharePrice)}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-2">Assets Under Management</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -191,7 +213,7 @@ export default function ManagerDetailPage() {
                                     <div>
                                         <p className="text-sm text-muted-foreground">Invested Assets</p>
                                         <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                                            ${mockInvestedAssets.toLocaleString()}
+                                            {formatScaledValue(manager.lockedFundValue)}
                                         </p>
                                     </div>
                                 </div>
@@ -208,7 +230,7 @@ export default function ManagerDetailPage() {
                                     <div>
                                         <p className="text-sm text-muted-foreground">Liquidable Assets</p>
                                         <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                            ${mockLiquidableAssets.toLocaleString()}
+                                            {formatScaledValue(manager.liquidFundValue)}
                                         </p>
                                     </div>
                                 </div>
@@ -257,7 +279,7 @@ export default function ManagerDetailPage() {
                                 </div>
                                 <div className="p-4 rounded-lg bg-muted/50">
                                     <p className="text-sm text-muted-foreground">Total Funds</p>
-                                    <p className="text-xl font-bold text-[#225B3A]">{formatCurrency(manager.totalFundsManaged)}</p>
+                                    <p className="text-xl font-bold text-[#225B3A]">{formatScaledValue(manager.totalFundsManaged)}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -285,11 +307,27 @@ export default function ManagerDetailPage() {
                         <CardContent className="space-y-3">
                             <div>
                                 <p className="text-sm text-muted-foreground mb-1">Contract Address</p>
-                                <p className="font-mono text-sm bg-muted p-2 rounded break-all">{manager.contractAddress}</p>
+                                <a
+                                    href={`https://sepolia.mantlescan.xyz/address/${manager.contractAddress}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-primary hover:underline font-mono text-sm bg-muted p-2 rounded break-all"
+                                >
+                                    {manager.contractAddress}
+                                    <ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground mb-1">Owner Address</p>
-                                <p className="font-mono text-sm bg-muted p-2 rounded break-all">{manager.owner}</p>
+                                <a
+                                    href={`https://sepolia.mantlescan.xyz/address/${manager.owner}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 text-primary hover:underline font-mono text-sm bg-muted p-2 rounded break-all"
+                                >
+                                    {manager.owner}
+                                    <ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
                             </div>
                         </CardContent>
                     </Card>
@@ -306,7 +344,7 @@ export default function ManagerDetailPage() {
                                     <Wallet className="h-4 w-4 text-muted-foreground" />
                                     <span className="text-sm text-muted-foreground">AUM</span>
                                 </div>
-                                <span className="font-semibold">{formatCurrency(manager.assetUnderManagement)}</span>
+                                <span className="font-semibold">{formatScaledValue(manager.totalFundsManaged)}</span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -330,7 +368,7 @@ export default function ManagerDetailPage() {
                     <Card className="border-2">
                         <CardContent className="p-6">
                             <Button className="w-full h-12 text-base font-semibold bg-[#225B3A] hover:bg-[#1C4A30]">
-                                Start Auto Manage
+                                Start Investment
                             </Button>
                             <p className="text-xs text-muted-foreground text-center mt-3">
                                 Connect your wallet to start auto-managing your portfolio
