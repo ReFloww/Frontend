@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Wallet, ArrowRight, Sprout, Fish, TreePine, Loader2 } from 'lucide-react';
+import { TrendingUp, Wallet, ArrowRight, Sprout, Fish, TreePine, Loader2, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetchMarketList, MarketItem } from '@/lib/api';
 import { TokenizedProduct } from '@/types/product-market';
@@ -82,11 +82,11 @@ export default function DashboardPage() {
     loadMarketData();
   }, []);
 
-  // Get actual wallet balances for all P2P tokens
-  const { activeAssets, totalValue, isLoading: isLoadingBalances } = usePortfolioBalances(products);
+  // Get actual wallet balances for all P2P tokens and USDT
+  const { activeAssets, totalValue, usdtBalance, isLoading: isLoadingBalances } = usePortfolioBalances(products);
 
   // Calculate asset distribution based on actual balances grouped by sector
-  const assetDistribution = ['Agriculture', 'Fisheries', 'Forestry'].map((sector) => {
+  const p2pDistribution = ['Agriculture', 'Fisheries', 'Forestry'].map((sector) => {
     const sectorAssets = activeAssets.filter(asset => asset.categoryId === sector);
     const sectorValue = sectorAssets.reduce((sum, asset) => sum + asset.balance, 0);
     const sectorColor = sector === 'Agriculture' ? '#16A34A' : sector === 'Fisheries' ? '#0EA5E9' : '#8B5CF6';
@@ -104,6 +104,22 @@ export default function DashboardPage() {
       }))
     };
   }).filter(sector => sector.count > 0); // Only show sectors with assets
+
+  // Add USDT to distribution if balance exists
+  const assetDistribution = [
+    ...p2pDistribution,
+    ...(usdtBalance > 0 ? [{
+      sector: 'USDT',
+      count: 1,
+      value: usdtBalance,
+      color: '#6B7280',
+      icon: DollarSign,
+      products: [{
+        name: 'USDT Balance',
+        value: `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      }]
+    }] : [])
+  ];
 
   const totalAssets = assetDistribution.reduce((sum, item) => sum + item.count, 0);
   const totalDistributionValue = assetDistribution.reduce((sum, item) => sum + item.value, 0);
