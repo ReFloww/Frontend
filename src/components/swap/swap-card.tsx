@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowDownUp, Loader2, CheckCircle2, XCircle } from 'lucide-react';
-import { PRODUCT_MARKET } from '@/lib/constants/product-market';
+import { TokenizedProduct } from '@/types/product-market';
 import { useSwapBalance } from '@/hooks/useSwapBalances';
 import { useSwapRouter } from '@/hooks/useSwapRouter';
 import TokenSelectorButton from '@/components/swap/_components/token-selector-button';
@@ -27,21 +27,21 @@ const getSectorColor = (sector: string) => {
   }
 };
 
-// Create available tokens from PRODUCT_MARKET only (USDT excluded from selection)
-const availableTokens = PRODUCT_MARKET.map((product) => ({
-  id: product.id,
-  ticker: product.symbol,
-  name: product.productName,
-  sector: product.categoryId,
-  icon: product.icon,
-  color: getSectorColor(product.categoryId),
-}));
-
 interface SwapCardProps {
+  products: TokenizedProduct[];
   initialSellTokenId?: string | null;
 }
 
-export default function SwapCard({ initialSellTokenId }: SwapCardProps) {
+export default function SwapCard({ products, initialSellTokenId }: SwapCardProps) {
+  // Create available tokens from products prop
+  const availableTokens = products.map((product) => ({
+    id: product.id,
+    ticker: product.symbol,
+    name: product.productName,
+    sector: product.categoryId,
+    icon: product.icon,
+    color: getSectorColor(product.categoryId),
+  }));
 
   const [sellAmount, setSellAmount] = useState('');
   const [buyAmount, setBuyAmount] = useState('');
@@ -53,11 +53,11 @@ export default function SwapCard({ initialSellTokenId }: SwapCardProps) {
 
   // Get token addresses for balance reading and swap operations
   const sellTokenAddress = sellToken
-    ? PRODUCT_MARKET.find(p => p.id === sellToken.id)?.tokenP2PAddress as `0x${string}`
+    ? products.find(p => p.id === sellToken.id)?.tokenP2PAddress as `0x${string}`
     : undefined;
 
   const buyTokenAddress = buyToken
-    ? PRODUCT_MARKET.find(p => p.id === buyToken.id)?.tokenP2PAddress as `0x${string}`
+    ? products.find(p => p.id === buyToken.id)?.tokenP2PAddress as `0x${string}`
     : undefined;
 
   // Read balances for selected tokens
