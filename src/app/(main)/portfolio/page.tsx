@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,17 +11,70 @@ import { managerMetadata, defaultManagerMetadata, getRiskColor } from '@/lib/con
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import PortfolioTable from '@/components/portfolio/portofoliotable';
-import SwapDialog from '@/components/swap/swap-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
+import { fetchMarketList, MarketItem } from '@/lib/api';
+import { TokenizedProduct } from '@/types/product-market';
+import { Sprout, Fish, TreePine } from 'lucide-react';
+
+// Icon mapping based on category
+const getCategoryIcon = (category: string | null | undefined) => {
+  if (!category) return Sprout;
+  switch (category.toLowerCase()) {
+    case 'agriculture':
+      return Sprout;
+    case 'fisheries':
+      return Fish;
+    case 'forestry':
+      return TreePine;
+    default:
+      return Sprout;
+  }
+};
+
+// Convert API response to TokenizedProduct format
+const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
+  id: item.id,
+  productName: item.name,
+  symbol: item.symbol,
+  categoryId: item.categoryId as 'Agriculture' | 'Fisheries' | 'Forestry',
+  description: item.description,
+  loanInterest: parseFloat(item.loanInterest),
+  loanAmount: parseFloat(item.loanAmount),
+  loanTenor: item.loanTenor,
+  creditRate: item.creditRate as 'A' | 'B' | 'C',
+  contractId: item.contractAddress,
+  tokenP2PAddress: item.contractAddress as `0x${string}`,
+  holderCount: parseInt(item.holderCount) || 0,
+  status: item.status,
+  icon: getCategoryIcon(item.categoryId),
+});
 
 export default function PortfolioPage() {
   const router = useRouter();
-  const [swapDialogOpen, setSwapDialogOpen] = useState(false);
-  const [selectedSwapToken, setSelectedSwapToken] = useState<string>('');
+  const [products, setProducts] = useState<TokenizedProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // Fetch market data on component mount
+  useEffect(() => {
+    const loadMarketData = async () => {
+      try {
+        setLoadingProducts(true);
+        const data = await fetchMarketList();
+        const mappedProducts = data.map(mapApiToProduct);
+        setProducts(mappedProducts);
+      } catch (err) {
+        console.error('Error loading market data:', err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadMarketData();
+  }, []);
 
   // Get actual wallet balances for all P2P tokens and USDT
-  const { activeAssets, totalValue, usdtBalance, isLoading, isConnected } = usePortfolioBalances();
+  const { activeAssets, totalValue, usdtBalance, isLoading, isConnected } = usePortfolioBalances(products);
 
   // Get user's manager investments
   const { investments: managerInvestments, totalInvested: totalManagerInvested, isLoading: isLoadingManager } = useUserManagerInvestments();
@@ -35,9 +88,8 @@ export default function PortfolioPage() {
   };
 
   const handleSwap = (productId: string, symbol: string) => {
-    // Open swap dialog with the token
-    setSelectedSwapToken(symbol);
-    setSwapDialogOpen(true);
+    // Navigate to swap page with the token
+    router.push(`/swap?sellToken=${productId}`);
   };
 
   const handleSell = (productId: string) => {
@@ -72,7 +124,7 @@ export default function PortfolioPage() {
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Total Portfolio Value</CardDescription>
-            {isLoading ? (
+            {isLoading || loadingProducts ? (
               <Skeleton className="h-10 w-32" />
             ) : (
               <div>
@@ -88,7 +140,7 @@ export default function PortfolioPage() {
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>USDT Balance</CardDescription>
-            {isLoading ? (
+            {isLoading || loadingProducts ? (
               <Skeleton className="h-10 w-32" />
             ) : (
               <div>
@@ -104,7 +156,7 @@ export default function PortfolioPage() {
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Total Invested</CardDescription>
-            {isLoading ? (
+            {isLoading || loadingProducts ? (
               <Skeleton className="h-10 w-24" />
             ) : (
               <div>
@@ -120,7 +172,7 @@ export default function PortfolioPage() {
         <Card className="border-2">
           <CardHeader className="pb-3">
             <CardDescription>Active Assets</CardDescription>
-            {isLoading ? (
+            {isLoading || loadingProducts ? (
               <Skeleton className="h-10 w-16" />
             ) : (
               <CardTitle className="text-3xl text-[#0A6A74]">{activeAssets.length}</CardTitle>
@@ -145,7 +197,7 @@ export default function PortfolioPage() {
         <TabsContent value="p2p-lending" className="mt-6">
           <PortfolioTable
             activeAssets={activeAssets}
-            isLoading={isLoading}
+            isLoading={isLoading || loadingProducts}
             isConnected={isConnected}
             onInvest={handleInvest}
             onSwap={handleSwap}
@@ -283,13 +335,6 @@ export default function PortfolioPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Swap Dialog */}
-      <SwapDialog
-        open={swapDialogOpen}
-        onOpenChange={setSwapDialogOpen}
-        defaultSellToken={selectedSwapToken}
-      />
     </div>
   );
 }

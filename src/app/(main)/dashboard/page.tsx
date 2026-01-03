@@ -1,45 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Wallet, ArrowRight, Sprout, Fish, TreePine } from 'lucide-react';
+import { TrendingUp, Wallet, ArrowRight, Sprout, Fish, TreePine, Loader2, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { fetchMarketList, MarketItem } from '@/lib/api';
+import { TokenizedProduct } from '@/types/product-market';
+import { usePortfolioBalances } from '@/hooks/usePortfolioBalances';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Mock data for market products
-const marketProducts = [
-  {
-    id: '1',
-    businessName: 'Green Valley Farms',
-    sector: 'Agriculture',
-    loanAmount: 50000,
-    interestRate: 10,
-    tenor: 10,
-    creditRating: 'A',
-    icon: Sprout,
-  },
-  {
-    id: '2',
-    businessName: 'Ocean Harvest Co.',
-    sector: 'Fisheries',
-    loanAmount: 75000,
-    interestRate: 10.2,
-    tenor: 18,
-    creditRating: 'B',
-    icon: Fish,
-  },
-  {
-    id: '3',
-    businessName: 'Timber Works Ltd',
-    sector: 'Forestry',
-    loanAmount: 120000,
-    interestRate: 9.8,
-    tenor: 24,
-    creditRating: 'A',
-    icon: TreePine,
-  },
-];
+// Icon mapping based on category
+const getCategoryIcon = (category: string | null | undefined) => {
+  if (!category) return Sprout;
+  switch (category.toLowerCase()) {
+    case 'agriculture':
+      return Sprout;
+    case 'fisheries':
+      return Fish;
+    case 'forestry':
+      return TreePine;
+    default:
+      return Sprout;
+  }
+};
+
+// Convert API response to TokenizedProduct format
+const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
+  id: item.id,
+  productName: item.name,
+  symbol: item.symbol,
+  categoryId: item.categoryId as 'Agriculture' | 'Fisheries' | 'Forestry',
+  description: item.description,
+  loanInterest: parseFloat(item.loanInterest),
+  loanAmount: parseFloat(item.loanAmount),
+  loanTenor: item.loanTenor,
+  creditRate: item.creditRate as 'A' | 'B' | 'C',
+  contractId: item.contractAddress,
+  tokenP2PAddress: item.contractAddress as `0x${string}`,
+  holderCount: parseInt(item.holderCount) || 0,
+  status: item.status,
+  icon: getCategoryIcon(item.categoryId),
+});
 
 const getCreditRatingColor = (rating: string) => {
   switch (rating) {
@@ -58,59 +61,85 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
+  const [products, setProducts] = useState<TokenizedProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Mock asset distribution data with products
+  // Fetch market data on component mount
+  useEffect(() => {
+    const loadMarketData = async () => {
+      try {
+        setLoadingProducts(true);
+        const data = await fetchMarketList();
+        const mappedProducts = data.map(mapApiToProduct);
+        setProducts(mappedProducts);
+      } catch (err) {
+        console.error('Error loading market data:', err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadMarketData();
+  }, []);
+
+  // Get actual wallet balances for all P2P tokens and USDT
+  const { activeAssets, totalValue, usdtBalance, isLoading: isLoadingBalances } = usePortfolioBalances(products);
+
+  // Calculate asset distribution based on actual balances grouped by sector
+  const p2pDistribution = ['Agriculture', 'Fisheries', 'Forestry'].map((sector) => {
+    const sectorAssets = activeAssets.filter(asset => asset.categoryId === sector);
+    const sectorValue = sectorAssets.reduce((sum, asset) => sum + asset.balance, 0);
+    const sectorColor = sector === 'Agriculture' ? '#16A34A' : sector === 'Fisheries' ? '#0EA5E9' : '#8B5CF6';
+    const sectorIcon = sector === 'Agriculture' ? Sprout : sector === 'Fisheries' ? Fish : TreePine;
+
+    return {
+      sector,
+      count: sectorAssets.length,
+      value: sectorValue,
+      color: sectorColor,
+      icon: sectorIcon,
+      products: sectorAssets.map(asset => ({
+        name: asset.productName,
+        value: `$${asset.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      }))
+    };
+  }).filter(sector => sector.count > 0); // Only show sectors with assets
+
+  // Add USDT to distribution if balance exists
   const assetDistribution = [
-    {
-      sector: 'Agriculture',
-      count: 3,
-      value: 8500,
-      color: '#16A34A',
-      icon: Sprout,
-      products: [
-        { name: 'Green Valley Farms', value: '$3,200' },
-        { name: 'Sunrise Agriculture', value: '$2,800' },
-        { name: 'Valley Crops Farm', value: '$2,500' },
-      ]
-    },
-    {
-      sector: 'Fisheries',
-      count: 3,
-      value: 9800,
-      color: '#0EA5E9',
-      icon: Fish,
-      products: [
-        { name: 'Ocean Harvest Co.', value: '$4,100' },
-        { name: 'Coastal Fisheries Inc.', value: '$3,200' },
-        { name: 'Pacific Seafood Ltd', value: '$2,500' },
-      ]
-    },
-    {
-      sector: 'Forestry',
-      count: 2,
-      value: 6216,
-      color: '#8B5CF6',
-      icon: TreePine,
-      products: [
-        { name: 'Timber Works Ltd', value: '$3,500' },
-        { name: 'Highland Timber Co.', value: '$2,716' },
-      ]
-    },
+    ...p2pDistribution,
+    ...(usdtBalance > 0 ? [{
+      sector: 'USDT',
+      count: 1,
+      value: usdtBalance,
+      color: '#6B7280',
+      icon: DollarSign,
+      products: [{
+        name: 'USDT Balance',
+        value: `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      }]
+    }] : [])
   ];
 
   const totalAssets = assetDistribution.reduce((sum, item) => sum + item.count, 0);
-  const totalValue = assetDistribution.reduce((sum, item) => sum + item.value, 0);
+  const totalDistributionValue = assetDistribution.reduce((sum, item) => sum + item.value, 0);
 
   // Calculate percentages and angles for donut chart
   const assetChartData = assetDistribution.map((asset, index) => {
-    const percentage = (asset.value / totalValue) * 100;
+    const percentage = totalDistributionValue > 0 ? (asset.value / totalDistributionValue) * 100 : 0;
     const startAngle = assetDistribution
       .slice(0, index)
-      .reduce((sum, a) => sum + (a.value / totalValue) * 360, 0);
-    const angle = (asset.value / totalValue) * 360;
+      .reduce((sum, a) => sum + (totalDistributionValue > 0 ? (a.value / totalDistributionValue) * 360 : 0), 0);
+    const angle = totalDistributionValue > 0 ? (asset.value / totalDistributionValue) * 360 : 0;
 
     return { ...asset, percentage, startAngle, angle };
   });
+
+  // Get featured market products (first 3)
+  const featuredProducts = products.slice(0, 3);
+
+  // Combined loading state
+  const isLoading = loadingProducts || isLoadingBalances;
 
   // Mock chart data for performance
   const performanceData = [
@@ -169,44 +198,68 @@ export default function DashboardPage() {
             <CardTitle className="text-2xl text-[#0A6A74]">Asset Allocation</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-8">
-              {/* Donut Chart */}
-              <div className="flex-shrink-0">
-                <div className="relative w-48 h-48">
-                  <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                    {assetChartData.map((asset, index) => (
-                      <path
-                        key={index}
-                        d={createDonutSegment(asset.startAngle, asset.angle, 45, 28)}
-                        fill={asset.color}
-                        className="transition-all cursor-pointer"
-                        style={{
-                          opacity: hoveredSector === null || hoveredSector === asset.sector ? 1 : 0.4,
-                          transform: hoveredSector === asset.sector ? 'scale(1.05)' : 'scale(1)',
-                          transformOrigin: 'center',
-                        }}
-                        onMouseEnter={() => setHoveredSector(asset.sector)}
-                        onMouseLeave={() => setHoveredSector(null)}
-                      />
-                    ))}
-                  </svg>
+            {isLoading ? (
+              <div className="flex items-center gap-8">
+                <Skeleton className="w-48 h-48 rounded-full" />
+                <div className="flex-1 space-y-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+              </div>
+            ) : assetDistribution.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Wallet className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-medium text-muted-foreground">No assets found</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Start investing to see your portfolio distribution
+                </p>
+                <Button
+                  className="mt-4 bg-[#225B3A] hover:bg-[#1C4A30]"
+                  onClick={() => router.push('/market')}
+                >
+                  Browse Market
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-8">
+                {/* Donut Chart */}
+                <div className="flex-shrink-0">
+                  <div className="relative w-48 h-48">
+                    <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                      {assetChartData.map((asset, index) => (
+                        <path
+                          key={index}
+                          d={createDonutSegment(asset.startAngle, asset.angle, 45, 28)}
+                          fill={asset.color}
+                          className="transition-all cursor-pointer"
+                          style={{
+                            opacity: hoveredSector === null || hoveredSector === asset.sector ? 1 : 0.4,
+                            transform: hoveredSector === asset.sector ? 'scale(1.05)' : 'scale(1)',
+                            transformOrigin: 'center',
+                          }}
+                          onMouseEnter={() => setHoveredSector(asset.sector)}
+                          onMouseLeave={() => setHoveredSector(null)}
+                        />
+                      ))}
+                    </svg>
 
-                  {/* Center text */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    {hoveredSector ? (
-                      <>
-                        <div className="text-2xl font-bold text-[#0A6A74]">
-                          {assetChartData.find(a => a.sector === hoveredSector)?.percentage.toFixed(0)}%
-                        </div>
-                        <div className="text-xs text-muted-foreground">{hoveredSector}</div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-3xl font-bold text-[#0A6A74]">{totalAssets}</div>
-                        <div className="text-xs text-muted-foreground">Assets</div>
-                      </>
-                    )}
-                  </div>
+                    {/* Center text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                      {hoveredSector ? (
+                        <>
+                          <div className="text-2xl font-bold text-[#0A6A74]">
+                            {assetChartData.find(a => a.sector === hoveredSector)?.percentage.toFixed(0)}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">{hoveredSector}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-3xl font-bold text-[#0A6A74]">{totalAssets}</div>
+                          <div className="text-xs text-muted-foreground">Assets</div>
+                        </>
+                      )}
+                    </div>
 
                   {/* Hover Tooltip */}
                   {hoveredSector && (
@@ -232,11 +285,11 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Legend */}
-              <div className="flex-1 space-y-4">
+                {/* Legend */}
+                <div className="flex-1 space-y-4">
 
 
                 {assetChartData.map((asset, index) => {
@@ -265,17 +318,17 @@ export default function DashboardPage() {
                   );
                 })}
 
-                <div className="pt-4 border-t">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                      <TrendingUp className="h-4 w-4" />
-                      <span className="font-semibold">+12.5%</span>
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">Total Value:</span>
+                      <span className="font-semibold text-[#0A6A74]">
+                        ${totalDistributionValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
                     </div>
-                    <span className="text-muted-foreground">from last month</span>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -400,47 +453,64 @@ export default function DashboardPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            {marketProducts.map((product) => {
-              const ProductIcon = product.icon;
-              return (
-                <Card
-                  key={product.id}
-                  className="cursor-pointer hover:shadow-lg transition-all hover:scale-105"
-                  onClick={() => router.push(`/market/${product.id}`)}
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                        <ProductIcon className="h-5 w-5 text-primary" />
-                      </div>
-                      <Badge className={getCreditRatingColor(product.creditRating)}>
-                        {product.creditRating}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-base text-[#0A6A74]">{product.businessName}</CardTitle>
-                    <CardDescription className="text-xs">{product.sector}</CardDescription>
+          {loadingProducts ? (
+            <div className="grid gap-4 md:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-10 w-10 mb-2" />
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-20" />
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Amount</span>
-                      <span className="font-semibold text-xs">${product.loanAmount.toLocaleString()} RSF</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Rate</span>
-                      <span className="font-semibold text-green-600 dark:text-green-400 text-xs">
-                        {product.interestRate}% p.a.
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tenor</span>
-                      <span className="font-medium text-xs">{product.tenor} months</span>
-                    </div>
+                  <CardContent>
+                    <Skeleton className="h-16 w-full" />
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-3">
+              {featuredProducts.map((product) => {
+                const ProductIcon = product.icon;
+                return (
+                  <Card
+                    key={product.id}
+                    className="cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                    onClick={() => router.push(`/market/${product.id}`)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <ProductIcon className="h-5 w-5 text-primary" />
+                        </div>
+                        <Badge className={getCreditRatingColor(product.creditRate)}>
+                          {product.creditRate}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-base text-[#0A6A74]">{product.productName}</CardTitle>
+                      <CardDescription className="text-xs">{product.categoryId}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Amount</span>
+                        <span className="font-semibold text-xs">${product.loanAmount.toLocaleString()} USDT</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Rate</span>
+                        <span className="font-semibold text-green-600 dark:text-green-400 text-xs">
+                          {product.loanInterest.toFixed(2)}% p.a.
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tenor</span>
+                        <span className="font-medium text-xs">{product.loanTenor} months</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
