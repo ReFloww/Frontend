@@ -16,10 +16,11 @@ import {
     Unlock,
     ExternalLink
 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { fetchManagerById, ManagerItem } from '@/lib/api';
 import ManagerChartsWithTabs from '@/components/ManagerChartsWithTabs';
+import ManagerInvestmentCard from '@/components/investment-funds/manager-investment-card';
 
 const getRiskColor = (riskLevel: string | null) => {
     if (!riskLevel) return 'border-gray-400 text-gray-500 bg-gray-50 dark:bg-gray-900/20';
@@ -89,7 +90,10 @@ const formatSharePrice = (value: string | null): string => {
 export default function ManagerDetailPage() {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
     const managerId = params.id as string;
+
+    const defaultTab = searchParams.get('tab') === 'withdraw' ? 'withdraw' : 'deposit';
 
     const [manager, setManager] = useState<ManagerItem | null>(null);
     const [loading, setLoading] = useState(true);
@@ -365,16 +369,12 @@ export default function ManagerDetailPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-2">
-                        <CardContent className="p-6">
-                            <Button className="w-full h-12 text-base font-semibold bg-[#225B3A] hover:bg-[#1C4A30]">
-                                Start Investment
-                            </Button>
-                            <p className="text-xs text-muted-foreground text-center mt-3">
-                                Connect your wallet to start auto-managing your portfolio
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <ManagerInvestmentCard
+                        sharePrice={manager.sharePrice || "1000000"}
+                        managerAddress={manager.contractAddress as `0x${string}`}
+                        managerName={manager.name}
+                        defaultTab={defaultTab}
+                    />
                 </div>
             </div>
         </div>
