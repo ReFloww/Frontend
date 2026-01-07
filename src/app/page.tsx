@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
-// SVG Icons for Features
 const CoinIcon = () => (
   <svg viewBox="0 0 48 48" fill="none" className="w-full h-full">
     <circle cx="24" cy="24" r="20" fill="url(#coinGradient)" />
@@ -440,19 +439,19 @@ const FlowDiagram = ({ steps }: { steps: string[] }) => {
       <defs>
         {/* Glow filter for active elements */}
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
           <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
 
         {/* Dot glow filter */}
         <filter id="dotGlow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
           <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
@@ -608,29 +607,26 @@ function KeyFeaturesSection() {
           <div className="relative inline-flex items-center p-1 bg-gray-100 rounded-full">
             {/* Sliding background indicator */}
             <div
-              className={`absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-out ${
-                activeMode === 'managed'
+              className={`absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-out ${activeMode === 'managed'
                   ? 'left-1 w-[100px] md:w-[110px] bg-gradient-to-r from-[#5A9FCA] to-[#2E6BA8]'
                   : 'left-[108px] md:left-[118px] w-[120px] md:w-[130px] bg-gradient-to-r from-[#7B6BA5] to-[#4A3F7B]'
-              }`}
+                }`}
             />
             <button
               onClick={() => setActiveMode('managed')}
-              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
-                activeMode === 'managed'
+              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${activeMode === 'managed'
                   ? 'text-white'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
             >
               Managed
             </button>
             <button
               onClick={() => setActiveMode('self')}
-              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
-                activeMode === 'self'
+              className={`relative z-10 px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${activeMode === 'self'
                   ? 'text-white'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
             >
               Self-Managed
             </button>
