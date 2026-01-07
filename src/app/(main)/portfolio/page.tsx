@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wallet, Landmark, Users, ChevronRight } from 'lucide-react';
 import { usePortfolioBalances } from '@/hooks/usePortfolioBalances';
-import { useUserManagerInvestments } from '@/hooks/useAutoManage';
+import { useApiUserManagerInvestments } from '@/hooks/useApiUserManagerInvestments';
 import { managerMetadata, defaultManagerMetadata, getRiskColor } from '@/lib/constants/manager-metadata';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,6 @@ import { fetchMarketList, MarketItem } from '@/lib/api';
 import { TokenizedProduct } from '@/types/product-market';
 import { Sprout, Fish, TreePine } from 'lucide-react';
 
-// Icon mapping based on category
 const getCategoryIcon = (category: string | null | undefined) => {
   if (!category) return Sprout;
   switch (category.toLowerCase()) {
@@ -32,7 +31,6 @@ const getCategoryIcon = (category: string | null | undefined) => {
   }
 };
 
-// Convert API response to TokenizedProduct format
 const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
   id: item.id,
   productName: item.name,
@@ -55,7 +53,6 @@ export default function PortfolioPage() {
   const [products, setProducts] = useState<TokenizedProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Fetch market data on component mount
   useEffect(() => {
     const loadMarketData = async () => {
       try {
@@ -73,27 +70,20 @@ export default function PortfolioPage() {
     loadMarketData();
   }, []);
 
-  // Get actual wallet balances for all P2P tokens and USDT
   const { activeAssets, totalValue, usdtBalance, isLoading, isConnected } = usePortfolioBalances(products);
+  const { investments: managerInvestments, totalInvested: totalManagerInvested, isLoading: isLoadingManager } = useApiUserManagerInvestments();
 
-  // Get user's manager investments
-  const { investments: managerInvestments, totalInvested: totalManagerInvested, isLoading: isLoadingManager } = useUserManagerInvestments();
-
-  // Calculate total portfolio value as USDT + Total Invested (P2P + Manager)
   const totalPortfolioValue = usdtBalance + totalValue + totalManagerInvested;
 
   const handleInvest = (productId: string) => {
-    // Navigate to market detail page with invest/buy tab active
     router.push(`/market/${productId}?tab=buy`);
   };
 
   const handleSwap = (productId: string, symbol: string) => {
-    // Navigate to swap page with the token
     router.push(`/swap?sellToken=${productId}`);
   };
 
   const handleSell = (productId: string) => {
-    // Navigate to market detail page with redeem/sell tab active
     router.push(`/market/${productId}?tab=sell`);
   };
 

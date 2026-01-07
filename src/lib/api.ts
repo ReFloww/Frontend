@@ -3,7 +3,7 @@
  */
 
 // Get API base URL from environment variable
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:30000/v1/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:30000/api/v1';
 
 /**
  * API Response Types
@@ -47,6 +47,29 @@ export interface ManagerItem {
     totalClients: number | null;
 }
 
+export interface UserManagerInvestment {
+    managerAddress: string;
+    managerName: string;
+    depositAmount: number;
+    rawDepositAmount: string;
+    totalDeposits: number;
+    sharePercentage: number;
+    sharePrice?: string;
+    metadata?: {
+        description?: string;
+        experienceYears?: number;
+        maxProfitAPY?: string;
+        riskLevel?: string;
+        strategy?: string;
+        totalClients?: number;
+    };
+}
+
+export interface UserManagerInvestmentsListResponse {
+    investments: UserManagerInvestment[];
+    totalInvested: number;
+}
+
 /**
  * Fetch market list from API
  */
@@ -57,7 +80,7 @@ export async function fetchMarketList(): Promise<MarketItem[]> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store', // Disable caching for fresh data
+            cache: 'no-store',
         });
 
         if (!response.ok) {
@@ -82,7 +105,7 @@ export async function fetchManagerList(): Promise<ManagerItem[]> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store', // Disable caching for fresh data
+            cache: 'no-store',
         });
 
         if (!response.ok) {
@@ -107,7 +130,7 @@ export async function fetchManagerById(id: string): Promise<ManagerItem> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store', // Disable caching for fresh data
+            cache: 'no-store',
         });
 
         if (!response.ok) {
@@ -123,6 +146,37 @@ export async function fetchManagerById(id: string): Promise<ManagerItem> {
 }
 
 /**
+ * Fetch user manager investments from API
+ */
+export async function fetchUserManagerInvestments(wallet: string): Promise<UserManagerInvestmentsListResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/investment-funds/user/investments?wallet=${wallet}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const result: UserManagerInvestmentsListResponse = await response.json();
+        return {
+            investments: result.investments || [],
+            totalInvested: result.totalInvested || 0,
+        };
+    } catch (error) {
+        console.error('Failed to fetch user manager investments:', error);
+        return {
+            investments: [],
+            totalInvested: 0,
+        };
+    }
+}
+
+/**
  * Fetch market item by ID from API
  */
 export async function fetchMarketItemById(id: string): Promise<MarketItem> {
@@ -132,7 +186,7 @@ export async function fetchMarketItemById(id: string): Promise<MarketItem> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store', // Disable caching for fresh data
+            cache: 'no-store',
         });
 
         if (!response.ok) {
@@ -224,4 +278,3 @@ export async function fetchRepaymentHistory(userAddress: string): Promise<Repaym
         throw error;
     }
 }
-
