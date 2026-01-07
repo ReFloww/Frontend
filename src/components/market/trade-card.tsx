@@ -81,12 +81,10 @@ export default function TradeCard({
             onAmountChange(value);
         }
 
-        // Calculate receive amount (1:1 ratio minus platform fee)
+        // Set receive amount to match buy amount (1:1 ratio)
         const numValue = parseFloat(value);
         if (!isNaN(numValue) && numValue > 0) {
-            const fee = numValue * (platformFee / 100);
-            const receiveAmount = numValue - fee;
-            setBuyReceiveAmount(receiveAmount.toFixed(2));
+            setBuyReceiveAmount(numValue.toFixed(2));
         } else {
             setBuyReceiveAmount('');
         }

@@ -76,13 +76,7 @@ export default function BuyTab({
                 <>
                     <Separator />
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <Coins className="h-3.5 w-3.5" />
-                                <span>Platform Fee ({platformFee}%)</span>
-                            </div>
-                            <span className="font-medium">${calculateFee(buyAmount)}</span>
-                        </div>
+
 
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2 text-muted-foreground">

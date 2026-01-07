@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, History, Settings, Briefcase, TrendingUp, Package, Bot, User, Droplet } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { UsdtBalanceAvatar } from '@/components/UsdtBalanceAvatar';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -85,6 +86,9 @@ export default function DashboardLayout({
               <Droplet className="h-4 w-4" />
               <span className="text-sm font-medium">Faucet</span>
             </Link>
+
+            {/* USDT Balance */}
+            <UsdtBalanceAvatar />
 
             {/* Connect Button */}
             <ConnectButton />
