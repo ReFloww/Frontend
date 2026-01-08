@@ -48,18 +48,16 @@ export interface ManagerItem {
 }
 
 export interface UserManagerInvestment {
-    managerAddress: string;
-    managerName: string;
-    depositAmount: number;
-    rawDepositAmount: string;
-    totalDeposits: number;
-    sharePercentage: number;
-    sharePrice?: string;
+    managerId: string;           // Manager contract address
+    assetName: string;           // Manager name (Asset column)
+    sector: string;              // Risk level (Sector column)
+    balanceTokens: number;       // Share balance (Balance column)
+    valueUsdt: number;           // USDT value (Value column)
+    returnPct: number;           // APY percentage (Return column)
+    sharePercentage?: number;    // Optional share percentage
     metadata?: {
         description?: string;
         experienceYears?: number;
-        maxProfitAPY?: string;
-        riskLevel?: string;
         strategy?: string;
         totalClients?: number;
     };

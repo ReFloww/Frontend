@@ -8,6 +8,14 @@ import { Wallet, Landmark, Users, ChevronRight } from 'lucide-react';
 import { usePortfolioBalances } from '@/hooks/usePortfolioBalances';
 import { useApiUserManagerInvestments } from '@/hooks/useApiUserManagerInvestments';
 import { managerMetadata, defaultManagerMetadata, getRiskColor } from '@/lib/constants/manager-metadata';
+
+// Manager logos mapping
+const MANAGER_LOGOS: Record<string, string> = {
+  'BNI AM': '/images/logo-BNI.png',
+  'MANDIRI MI': '/images/logo-MANDIRI.png',
+  'Mandiri MI': '/images/logo-MANDIRI.png',
+  'BRI MI': '/images/logo-BRI.png',
+};
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import PortfolioTable from '@/components/portfolio/portofoliotable';
@@ -258,26 +266,34 @@ export default function PortfolioPage() {
                   {/* Manager Investment List */}
                   <div className="space-y-3">
                     {managerInvestments.map((investment) => {
-                      const addressLower = investment.managerAddress.toLowerCase();
+                      const addressLower = investment.managerId.toLowerCase();
                       const metadata = managerMetadata[addressLower] || defaultManagerMetadata;
-                      const displayName = metadata.displayName || investment.managerName;
+                      const displayName = metadata.displayName || investment.assetName;
 
                       return (
                         <div
-                          key={investment.managerAddress}
+                          key={investment.managerId}
                           className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                          onClick={() => router.push(`/auto-manage/${investment.managerAddress}`)}
+                          onClick={() => router.push(`/auto-manage/${investment.managerId}`)}
                         >
                           {/* Manager Avatar */}
-                          <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-muted">
-                            <Image
-                              src={metadata.avatar}
-                              alt={displayName}
-                              width={48}
-                              height={48}
-                              className="object-cover w-full h-full"
-                              unoptimized
-                            />
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-white border border-gray-100 flex items-center justify-center p-1">
+                            {MANAGER_LOGOS[investment.assetName] ? (
+                              <div className="relative w-full h-full">
+                                <Image
+                                  src={MANAGER_LOGOS[investment.assetName]}
+                                  alt={`${investment.assetName} Logo`}
+                                  fill
+                                  className="object-contain"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-[#225B3A] to-[#0A6A74] flex items-center justify-center rounded-lg">
+                                <span className="text-lg font-bold text-white">
+                                  {investment.assetName.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Manager Info */}
@@ -286,22 +302,22 @@ export default function PortfolioPage() {
                               <p className="font-semibold">{displayName}</p>
                               <Badge
                                 variant="outline"
-                                className={`${getRiskColor(metadata.riskLevel)} text-xs`}
+                                className={`${getRiskColor(investment.sector)} text-xs`}
                               >
-                                {metadata.riskLevel}
+                                {investment.sector}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              Share: {investment.sharePercentage.toFixed(2)}%
+                              Share: {investment.sharePercentage?.toFixed(2) || '0.00'}%
                             </p>
                           </div>
 
                           {/* Investment Amount */}
                           <div className="text-right">
                             <p className="font-semibold text-[#0A6A74]">
-                              ${investment.depositAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              ${investment.valueUsdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
-                            <p className="text-xs text-muted-foreground">Deposited</p>
+                            <p className="text-xs text-muted-foreground">{investment.balanceTokens.toLocaleString()} Shares</p>
                           </div>
 
                           {/* Arrow */}

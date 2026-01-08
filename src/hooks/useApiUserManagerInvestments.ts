@@ -30,7 +30,7 @@ export function useApiUserManagerInvestments() {
         loadInvestments();
     }, [userAddress, isConnected]);
 
-    const totalInvested = investments.reduce((sum, inv) => sum + inv.depositAmount, 0);
+    const totalInvested = investments.reduce((sum, inv) => sum + inv.valueUsdt, 0);
 
     return {
         investments,
