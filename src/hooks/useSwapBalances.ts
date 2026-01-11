@@ -3,16 +3,13 @@ import { formatUnits } from 'viem';
 import { tokenP2PAbi } from '@/lib/abis/TokenP2P';
 import { mockUsdtAbi } from '@/lib/abis/MockUSDT';
 
-const USDT_ADDRESS = '0xe01c5464816a544d4d0d6a336032578bd4629F10' as `0x${string}`;
+const USDT_ADDRESS = process.env.NEXT_PUBLIC_USDT_ADDRESS as `0x${string}`;
 
 interface UseSwapBalancesProps {
     tokenAddress?: `0x${string}`;
     isUSDT?: boolean;
 }
 
-/**
- * Hook to read balance for a specific token (P2P or USDT)
- */
 export function useSwapBalance({ tokenAddress, isUSDT = false }: UseSwapBalancesProps) {
     const { address: userAddress, isConnected } = useAccount();
 

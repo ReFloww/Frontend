@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits } from 'viem';
 import { abi as SwapRouterABI } from '@/lib/abis/SwapRouter';
-import { mockUsdtAbi as ERC20ABI } from '@/lib/abis/MockUSDT';
+import { tokenP2PAbi } from '@/lib/abis/TokenP2P';
 
-const SWAP_ROUTER_ADDRESS = '0x6c83fab8Bf840F62F810c51B9eB986a75411a950' as `0x${string}`;
-const USDT_ADDRESS = '0xe01c5464816a544d4d0d6a336032578bd4629F10' as `0x${string}`;
+const SWAP_ROUTER_ADDRESS = process.env.NEXT_PUBLIC_SWAP_ROUTER_ADDRESS as `0x${string}`;
 
 interface UseSwapRouterProps {
   fromTokenAddress: `0x${string}`;
@@ -19,11 +18,12 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
   const { address: userAddress, isConnected } = useAccount();
   const [lastApprovedTx, setLastApprovedTx] = useState<`0x${string}` | null>(null);
   const [lastSwapTx, setLastSwapTx] = useState<`0x${string}` | null>(null);
+  const [pendingSwapAmount, setPendingSwapAmount] = useState<string | null>(null);
 
   // Read allowance for the fromToken
   const { data: allowance = BigInt(0), refetch: refetchAllowance } = useReadContract({
     address: fromTokenAddress,
-    abi: ERC20ABI,
+    abi: tokenP2PAbi,
     functionName: 'allowance',
     args: userAddress ? [userAddress, SWAP_ROUTER_ADDRESS] : undefined,
     query: {
@@ -33,15 +33,15 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
   });
 
   // Approve token spending
-  // const { writeContract: approveWrite, data: approveTxHash, reset: resetApprove } = useWriteContract();
+  const { writeContract: approveWrite, data: approveTxHash, reset: resetApprove } = useWriteContract();
 
-  // const {
-  //   isLoading: isApproveTxPending,
-  //   isSuccess: isApproveTxSuccess,
-  //   isError: isApproveTxError,
-  // } = useWaitForTransactionReceipt({
-  //   hash: approveTxHash,
-  // });
+  const {
+    isLoading: isApproveTxPending,
+    isSuccess: isApproveTxSuccess,
+    isError: isApproveTxError,
+  } = useWaitForTransactionReceipt({
+    hash: approveTxHash,
+  });
 
   // Execute swap
   const { writeContract: swapWrite, data: swapTxHash, reset: resetSwap } = useWriteContract();
@@ -54,22 +54,34 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
     hash: swapTxHash,
   });
 
-  // Handle approval success
-  // useEffect(() => {
-  //   if (isApproveTxSuccess && approveTxHash && approveTxHash !== lastApprovedTx) {
-  //     setLastApprovedTx(approveTxHash);
-  //     refetchAllowance();
-  //     console.log('✅ Approval successful:', approveTxHash);
-  //   }
-  // }, [isApproveTxSuccess, approveTxHash, lastApprovedTx, refetchAllowance]);
+  // Handle approval success - then execute swap
+  useEffect(() => {
+    if (isApproveTxSuccess && approveTxHash && approveTxHash !== lastApprovedTx) {
+      setLastApprovedTx(approveTxHash);
+      refetchAllowance();
+      console.log('✅ Approval successful:', approveTxHash);
+
+      // If there's a pending swap, execute it after approval
+      if (pendingSwapAmount) {
+        console.log('🔄 Executing pending swap after approval...');
+        const amount = pendingSwapAmount;
+        setPendingSwapAmount(null);
+
+        setTimeout(() => {
+          performSwap(amount);
+        }, 1000);
+      }
+    }
+  }, [isApproveTxSuccess, approveTxHash, lastApprovedTx, refetchAllowance, pendingSwapAmount]);
 
   // Handle approval error
-  // useEffect(() => {
-  //   if (isApproveTxError && approveTxHash) {
-  //     console.error('❌ Approval failed:', approveTxHash);
-  //     resetApprove();
-  //   }
-  // }, [isApproveTxError, approveTxHash, resetApprove]);
+  useEffect(() => {
+    if (isApproveTxError && approveTxHash) {
+      console.error('❌ Approval failed:', approveTxHash);
+      setPendingSwapAmount(null);
+      resetApprove();
+    }
+  }, [isApproveTxError, approveTxHash, resetApprove]);
 
   // Handle swap success
   useEffect(() => {
@@ -79,10 +91,6 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
       if (onSuccess) {
         onSuccess();
       }
-      // Reset after success callback
-      // setTimeout(() => {
-      //   resetSwap();
-      // }, 10000);
     }
   }, [isSwapTxSuccess, swapTxHash, lastSwapTx, onSuccess, resetSwap]);
 
@@ -95,47 +103,47 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
   }, [isSwapTxError, swapTxHash, resetSwap]);
 
   // Approve tokens
-  // const approveToken = async (amount: string) => {
-  //   if (!isConnected || !userAddress) {
-  //     throw new Error('Wallet not connected');
-  //   }
+  const approveToken = async (amount: string) => {
+    if (!isConnected || !userAddress) {
+      throw new Error('Wallet not connected');
+    }
 
-  //   if (!fromTokenAddress) {
-  //     throw new Error('Invalid token address');
-  //   }
+    if (!fromTokenAddress) {
+      throw new Error('Invalid token address');
+    }
 
-  //   try {
-  //     const amountInWei = parseUnits(amount, 6);
+    try {
+      const amountInWei = parseUnits(amount, 6);
 
-  //     console.log('📝 Approving:', {
-  //       token: fromTokenAddress,
-  //       spender: SWAP_ROUTER_ADDRESS,
-  //       amount: amount,
-  //       amountWei: amountInWei.toString(),
-  //     });
+      console.log('📝 Approving:', {
+        token: fromTokenAddress,
+        spender: SWAP_ROUTER_ADDRESS,
+        amount: amount,
+        amountWei: amountInWei.toString(),
+      });
 
-  //     approveWrite(
-  //       {
-  //         address: fromTokenAddress,
-  //         abi: ERC20ABI,
-  //         functionName: 'approve',
-  //         args: [SWAP_ROUTER_ADDRESS, amountInWei],
-  //       },
-  //       {
-  //         onError: (error) => {
-  //           console.error('Approval write error:', error);
-  //           throw error;
-  //         },
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.error('Error approving token:', error);
-  //     throw error;
-  //   }
-  // };
+      approveWrite(
+        {
+          address: fromTokenAddress,
+          abi: tokenP2PAbi,
+          functionName: 'approve',
+          args: [SWAP_ROUTER_ADDRESS, amountInWei],
+        },
+        {
+          onError: (error) => {
+            console.error('Approval write error:', error);
+            throw error;
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error approving token:', error);
+      throw error;
+    }
+  };
 
-  // Execute swap
-  const executeSwap = async (amount: string) => {
+  // Perform the actual swap
+  const performSwap = (amount: string) => {
     if (!isConnected || !userAddress) {
       throw new Error('Wallet not connected');
     }
@@ -174,24 +182,51 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
     }
   };
 
+  // One-click swap: approve if needed, then swap
+  const executeSwap = async (amount: string) => {
+    if (!isConnected || !userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
+    if (!fromTokenAddress || !toTokenAddress) {
+      throw new Error('Invalid token addresses');
+    }
+
+    try {
+      const amountInWei = parseUnits(amount, 6);
+
+      // Check if allowance is sufficient
+      if (allowance < amountInWei) {
+        console.log('⚠️ Insufficient allowance, approving first...');
+        setPendingSwapAmount(amount);
+        await approveToken(amount);
+      } else {
+        console.log('✅ Sufficient allowance, proceeding with swap...');
+        performSwap(amount);
+      }
+    } catch (error) {
+      console.error('Error in swap flow:', error);
+      throw error;
+    }
+  };
+
   return {
     // State
     allowance,
-    // isApproving: isApproveTxPending,
+    isApproving: isApproveTxPending || !!pendingSwapAmount,
     isSwapping: isSwapTxPending,
     isConnected,
-    // isApproveTxSuccess,
+    isApproveTxSuccess,
     isSwapTxSuccess,
-    // isApproveTxError,
+    isApproveTxError,
     isSwapTxError,
 
     // Functions
-    // approveToken,
     executeSwap,
     refetchAllowance,
 
     // Transaction hashes
-    // approveTxHash,
+    approveTxHash,
     swapTxHash,
   };
 }

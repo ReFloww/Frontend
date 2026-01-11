@@ -4,14 +4,17 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowDownUp, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowDownUp, Loader2, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { TokenizedProduct } from '@/types/product-market';
 import { useSwapBalance } from '@/hooks/useSwapBalances';
 import { useSwapRouter } from '@/hooks/useSwapRouter';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import TokenSelectorButton from '@/components/swap/_components/token-selector-button';
 import TokenSelectionDialog from '@/components/swap/_components/token-selection-dialog';
 import { toast } from 'sonner';
-import { parseUnits, formatUnits } from 'viem';
+import { useAccount, useReadContract } from 'wagmi';
+import { tokenP2PAbi } from '@/lib/abis/TokenP2P';
+import { formatUnits } from 'viem';
 
 // Map product colors by sector
 const getSectorColor = (sector: string) => {
@@ -50,6 +53,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
   const [isSelectingSell, setIsSelectingSell] = useState(false);
   const [isSelectingBuy, setIsSelectingBuy] = useState(false);
   const [step, setStep] = useState<'input' | 'swapping'>('input');
+  const { address, isConnected } = useAccount();
 
   // Get token addresses for balance reading and swap operations
   const sellTokenAddress = sellToken
@@ -61,7 +65,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     : undefined;
 
   // Read balances for selected tokens
-  const { balance: sellBalance, isConnected, refetch: refetchSellBalance } = useSwapBalance({
+  const { balance: sellBalance, refetch: refetchSellBalance } = useSwapBalance({
     tokenAddress: sellTokenAddress,
     isUSDT: false,
   });
@@ -70,6 +74,37 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     tokenAddress: buyTokenAddress,
     isUSDT: false,
   });
+
+  // Read token prices for both sell and buy tokens
+  const { price: sellTokenPrice } = useTokenPrice({
+    tokenAddress: sellTokenAddress,
+  });
+
+  const { price: buyTokenPrice } = useTokenPrice({
+    tokenAddress: buyTokenAddress,
+  });
+
+  // Fetch all token balances using wagmi
+  const allBalancesQueries = products.map((product) => {
+    return useReadContract({
+      address: product.tokenP2PAddress as `0x${string}`,
+      abi: tokenP2PAbi,
+      functionName: 'balanceOf',
+      args: address ? [address] : undefined,
+      query: {
+        enabled: isConnected && !!address,
+        refetchInterval: 10000,
+      },
+    });
+  });
+
+  // Create a mapping of token ID to balance
+  const allTokenBalances: Record<string, number> = products.reduce((acc, product, index) => {
+    const balanceData = allBalancesQueries[index]?.data;
+    const balance = balanceData ? parseFloat(formatUnits(balanceData as bigint, 6)) : 0;
+    acc[product.id] = balance;
+    return acc;
+  }, {} as Record<string, number>);
 
   // Use SwapRouter hook
   const {
@@ -182,14 +217,18 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     }
   };
 
-  // Auto-calculate buy amount (1:1 ratio since all tokens are backed by USDT)
+  // Calculate buy amount based on token prices
   useEffect(() => {
-    if (sellAmount && parseFloat(sellAmount) > 0) {
-      setBuyAmount(sellAmount);
+    if (sellAmount && parseFloat(sellAmount) > 0 && sellTokenPrice > 0 && buyTokenPrice > 0) {
+      const amount = parseFloat(sellAmount);
+      // Calculate based on price ratio
+      // Formula: buyAmount = sellAmount * (sellTokenPrice / buyTokenPrice)
+      const calculatedBuyAmount = amount * (sellTokenPrice / buyTokenPrice);
+      setBuyAmount(calculatedBuyAmount.toFixed(6));
     } else {
       setBuyAmount('');
     }
-  }, [sellAmount]);
+  }, [sellAmount, sellTokenPrice, buyTokenPrice]);
 
   // Clear amounts when tokens are changed
   useEffect(() => {
@@ -197,6 +236,17 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     setBuyAmount('');
     setStep('input'); // Reset step when changing tokens
   }, [sellToken?.id, buyToken?.id]);
+
+  // Calculate exchange rate for preview
+  const getExchangeRate = () => {
+    if (sellTokenPrice > 0 && buyTokenPrice > 0) {
+      const rate = sellTokenPrice / buyTokenPrice;
+      return rate.toFixed(6);
+    }
+    return null;
+  };
+
+  const exchangeRate = getExchangeRate();
 
   // Determine button state and text
   const getButtonState = () => {
@@ -328,6 +378,56 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
 
           </div>
 
+          {/* Exchange Rate Preview Card - Only show when amount is entered */}
+          {sellAmount && parseFloat(sellAmount) > 0 && exchangeRate && (
+            <div className="mt-4 px-2 space-y-3 animate-in fade-in slide-in-from-top-2">
+
+              {/* Exchange Rate */}
+              <div className="flex justify-between items-center text-[13px]">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Info className="h-3.5 w-3.5" />
+                  <span>Exchange Rate</span>
+                </div>
+
+                <div className="text-right">
+                  <div className="font-semibold">
+                    1 {sellToken?.ticker} ≈ {exchangeRate} {buyToken?.ticker}
+                  </div>
+
+                  {exchangeRate && (
+                    <div className="text-[11px] text-muted-foreground">
+                      1 {buyToken?.ticker} ≈ {(1 / parseFloat(exchangeRate)).toFixed(6)} {sellToken?.ticker}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Detail Box */}
+              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-2">
+                {/* Minimum received (logic UI atas) */}
+                <div className="flex justify-between text-xs pt-2 ">
+                  <span className="text-muted-foreground">Minimum Received</span>
+                  <span className="font-medium">
+                    {(parseFloat(buyAmount) * 0.995).toFixed(6)} {buyToken?.ticker}
+                  </span>
+                </div>
+
+                {/* Price impact */}
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Price Impact</span>
+                  <span className="text-green-500 font-medium">{'< 0.01%'}</span>
+                </div>
+
+                {/* Conversion summary (diambil dari card bawah) */}
+                <div className="flex justify-center pt-2 text-xs text-muted-foreground">
+                  {sellAmount} {sellToken?.ticker} → {buyAmount} {buyToken?.ticker}
+                </div>
+
+              </div>
+            </div>
+          )}
+
+
           {/* Swap Action Button */}
           <Button
             className="w-full h-14 text-lg font-semibold bg-[#225B3A] hover:bg-[#1C4A30] mt-6 rounded-xl transition-all cursor-pointer hover:shadow-lg hover:scale-102 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -395,6 +495,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
         tokens={availableTokens.filter(token => token.id !== buyToken?.id)}
         selectedToken={sellToken}
         onSelect={(token) => handleTokenSelect(token, true)}
+        tokenBalances={allTokenBalances}
       />
 
       {/* Token Selection Modal for Buy */}
@@ -406,6 +507,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
         tokens={availableTokens.filter(token => token.id !== sellToken?.id)}
         selectedToken={buyToken}
         onSelect={(token) => handleTokenSelect(token, false)}
+        tokenBalances={allTokenBalances}
       />
     </>
   );
