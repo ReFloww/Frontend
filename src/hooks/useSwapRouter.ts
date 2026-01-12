@@ -19,6 +19,8 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
   const [lastApprovedTx, setLastApprovedTx] = useState<`0x${string}` | null>(null);
   const [lastSwapTx, setLastSwapTx] = useState<`0x${string}` | null>(null);
   const [pendingSwapAmount, setPendingSwapAmount] = useState<string | null>(null);
+  const [hasHandledApproveError, setHasHandledApproveError] = useState(false);
+  const [hasHandledSwapError, setHasHandledSwapError] = useState(false);
 
   // Read allowance for the fromToken
   const { data: allowance = BigInt(0), refetch: refetchAllowance } = useReadContract({
@@ -58,6 +60,7 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
   useEffect(() => {
     if (isApproveTxSuccess && approveTxHash && approveTxHash !== lastApprovedTx) {
       setLastApprovedTx(approveTxHash);
+      setHasHandledApproveError(false); // Clear error flag on success
       refetchAllowance();
       console.log('✅ Approval successful:', approveTxHash);
 
@@ -76,17 +79,19 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
 
   // Handle approval error
   useEffect(() => {
-    if (isApproveTxError && approveTxHash) {
+    if (isApproveTxError && approveTxHash && !hasHandledApproveError) {
       console.error('❌ Approval failed:', approveTxHash);
       setPendingSwapAmount(null);
+      setHasHandledApproveError(true); // Mark error as handled
       resetApprove();
     }
-  }, [isApproveTxError, approveTxHash, resetApprove]);
+  }, [isApproveTxError, approveTxHash, hasHandledApproveError, resetApprove]);
 
   // Handle swap success
   useEffect(() => {
     if (isSwapTxSuccess && swapTxHash && swapTxHash !== lastSwapTx) {
       setLastSwapTx(swapTxHash);
+      setHasHandledSwapError(false); // Clear error flag on success
       console.log('✅ Swap successful:', swapTxHash);
       if (onSuccess) {
         onSuccess();
@@ -96,11 +101,12 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
 
   // Handle swap error
   useEffect(() => {
-    if (isSwapTxError && swapTxHash) {
+    if (isSwapTxError && swapTxHash && !hasHandledSwapError) {
       console.error('❌ Swap failed:', swapTxHash);
+      setHasHandledSwapError(true); // Mark error as handled
       resetSwap();
     }
-  }, [isSwapTxError, swapTxHash, resetSwap]);
+  }, [isSwapTxError, swapTxHash, hasHandledSwapError, resetSwap]);
 
   // Approve tokens
   const approveToken = async (amount: string) => {
@@ -132,6 +138,7 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
         {
           onError: (error) => {
             console.error('Approval write error:', error);
+            setPendingSwapAmount(null); // Clear pending swap on write error (user rejected)
             throw error;
           },
         }
@@ -172,6 +179,7 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
         {
           onError: (error) => {
             console.error('Swap write error:', error);
+            setPendingSwapAmount(null); // Clear pending swap on write error (user rejected)
             throw error;
           },
         }
@@ -199,15 +207,23 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
       if (allowance < amountInWei) {
         console.log('⚠️ Insufficient allowance, approving first...');
         setPendingSwapAmount(amount);
+        setHasHandledApproveError(false); // Reset error flag before new transaction
         await approveToken(amount);
       } else {
         console.log('✅ Sufficient allowance, proceeding with swap...');
+        setHasHandledSwapError(false); // Reset error flag before new transaction
         performSwap(amount);
       }
     } catch (error) {
       console.error('Error in swap flow:', error);
       throw error;
     }
+  };
+
+  // Reset error states (for retry functionality)
+  const resetErrorStates = () => {
+    setHasHandledApproveError(false);
+    setHasHandledSwapError(false);
   };
 
   return {
@@ -218,12 +234,15 @@ export function useSwapRouter({ fromTokenAddress, toTokenAddress, onSuccess }: U
     isConnected,
     isApproveTxSuccess,
     isSwapTxSuccess,
-    isApproveTxError,
-    isSwapTxError,
+    // Use local error states - only show error if we haven't handled it yet
+    // and there's a transaction hash
+    isApproveTxError: hasHandledApproveError && !!approveTxHash,
+    isSwapTxError: hasHandledSwapError && !!swapTxHash,
 
     // Functions
     executeSwap,
     refetchAllowance,
+    resetErrorStates,
 
     // Transaction hashes
     approveTxHash,

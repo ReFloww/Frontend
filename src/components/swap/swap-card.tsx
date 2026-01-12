@@ -53,6 +53,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
   const [isSelectingSell, setIsSelectingSell] = useState(false);
   const [isSelectingBuy, setIsSelectingBuy] = useState(false);
   const [step, setStep] = useState<'input' | 'swapping'>('input');
+  const [userRejectedError, setUserRejectedError] = useState(false);
   const { address, isConnected } = useAccount();
 
   // Get token addresses for balance reading and swap operations
@@ -109,10 +110,14 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
   // Use SwapRouter hook
   const {
     isSwapping,
+    isApproving,
     executeSwap,
     isSwapTxSuccess,
     isSwapTxError,
+    isApproveTxError,
+    isApproveTxSuccess,
     swapTxHash,
+    approveTxHash,
   } = useSwapRouter({
     fromTokenAddress: sellTokenAddress!,
     toTokenAddress: buyTokenAddress!,
@@ -146,16 +151,9 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
       setStep('input');
       setSellAmount('');
       setBuyAmount('');
+      setUserRejectedError(false); // Clear rejection error on success
     }
   }, [isSwapTxSuccess]);
-
-  // Handle swap failure - reset step but keep amounts for retry
-  useEffect(() => {
-    if (isSwapTxError) {
-      setStep('input');
-      toast.error('Swap transaction failed. Please try again.');
-    }
-  }, [isSwapTxError]);
 
 
   const handleTokenSelect = (token: any, isSell: boolean) => {
@@ -197,6 +195,9 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     }
 
     try {
+      // Clear any previous user rejection error
+      setUserRejectedError(false);
+
       // Execute swap directly without approval check
       toast.info(`Swapping ${sellAmount} ${sellToken?.ticker} for ${buyToken?.ticker}...`);
       setStep('swapping');
@@ -207,10 +208,12 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
       const errorMessage = error?.message || 'Transaction failed';
 
       // Check for common errors
-      if (errorMessage.includes('user rejected')) {
+      if (errorMessage.includes('user rejected') || errorMessage.includes('User rejected')) {
         toast.error('Transaction rejected by user');
+        setUserRejectedError(true); // Set flag to show "Swap" instead of "Retry"
       } else if (errorMessage.includes('insufficient funds')) {
         toast.error('Insufficient funds for gas');
+        setUserRejectedError(true);
       } else {
         toast.error(errorMessage);
       }
@@ -235,6 +238,7 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
     setSellAmount('');
     setBuyAmount('');
     setStep('input'); // Reset step when changing tokens
+    setUserRejectedError(false); // Clear rejection error when changing tokens
   }, [sellToken?.id, buyToken?.id]);
 
   // Calculate exchange rate for preview
@@ -265,17 +269,24 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
       return { disabled: true, text: 'Select Tokens' };
     }
 
-    // condition bug state
-    // Kondisi 1: Swap Error (prioritas tertinggi)
-    if ((step === 'swapping' || isSwapping) && isSwapTxError) {
-      return { disabled: false, text: 'ulang', showLoader: false };
+    // If user rejected the transaction (no tx was submitted), go back to "Swap"
+    // This happens when user cancels the wallet approval prompt
+    if (userRejectedError) {
+      return { disabled: false, text: 'Swap' };
     }
 
-    // Kondisi 2: Swap sedang berlangsung (belum sukses & tidak error)
-    if ((step === 'swapping' || isSwapping) && !isSwapTxSuccess && !isSwapTxError) {
-      return { disabled: true, text: 'Swapping...', showLoader: true };
+    // Priority 1: Any error state (approval or swap) - show retry button
+    // Only show "Retry" if there's an actual failed transaction (with tx hash)
+    if (isApproveTxError || isSwapTxError) {
+      return { disabled: false, text: 'Retry', showLoader: false };
     }
 
+    // Priority 2: Transaction in progress (approving, approval succeeded pending swap, or swapping)
+    // Include isApproveTxSuccess to handle the gap between approval and swap execution
+    // (prevents button from briefly showing "Swap" during the 1-second timeout)
+    if (isApproving || isSwapping || (isApproveTxSuccess && !isSwapTxSuccess)) {
+      return { disabled: true, text: isApproving ? 'Approving...' : 'Swapping...', showLoader: true };
+    }
 
     return { disabled: false, text: 'Swap' };
   };
@@ -439,36 +450,44 @@ export default function SwapCard({ products, initialSellTokenId }: SwapCardProps
           </Button>
 
           {/* Transaction Status */}
-          {(isSwapping || isSwapTxSuccess || isSwapTxError) && swapTxHash && (
-            <div className={`mt-4 p-4 rounded-lg border ${isSwapTxError
+          {(isApproving || isSwapping || isSwapTxSuccess || isSwapTxError || isApproveTxError) && (approveTxHash || swapTxHash) && (
+            <div className={`mt-4 p-4 rounded-lg border ${(isSwapTxError || isApproveTxError)
               ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
               : 'bg-muted/50'
               }`}>
               <div className="flex items-start gap-3">
-                {isSwapping ? (
+                {isApproving ? (
                   <Loader2 className="h-5 w-5 animate-spin text-primary mt-0.5" />
+                ) : isSwapping ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-primary mt-0.5" />
+                ) : isApproveTxError ? (
+                  <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
                 ) : isSwapTxError ? (
                   <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
                 ) : (
                   <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
                 )}
                 <div className="flex-1">
-                  <p className={`font-medium text-sm ${isSwapTxError ? 'text-red-600' : ''}`}>
-                    {isSwapping
-                      ? `Swapping ${sellToken?.ticker} for ${buyToken?.ticker}...`
-                      : isSwapTxError
-                        ? 'Swap Transaction Failed'
-                        : isSwapTxSuccess
-                          ? 'Swap Completed Successfully!'
-                          : 'Processing...'}
+                  <p className={`font-medium text-sm ${(isSwapTxError || isApproveTxError) ? 'text-red-600' : ''}`}>
+                    {isApproving
+                      ? 'Approving token...'
+                      : isSwapping
+                        ? `Swapping ${sellToken?.ticker} for ${buyToken?.ticker}...`
+                        : isApproveTxError
+                          ? 'Approval Transaction Failed'
+                          : isSwapTxError
+                            ? 'Swap Transaction Failed'
+                            : isSwapTxSuccess
+                              ? 'Swap Completed Successfully!'
+                              : 'Processing...'}
                   </p>
-                  {swapTxHash && (
+                  {(approveTxHash || swapTxHash) && (
                     <>
                       <p className="text-xs text-muted-foreground mt-1 break-all">
-                        Tx: {swapTxHash.slice(0, 10)}...{swapTxHash.slice(-8)}
+                        Tx: {(approveTxHash || swapTxHash)!.slice(0, 10)}...{(approveTxHash || swapTxHash)!.slice(-8)}
                       </p>
                       <a
-                        href={`https://sepolia.mantlescan.xyz/tx/${swapTxHash}`}
+                        href={`https://sepolia.mantlescan.xyz/tx/${approveTxHash || swapTxHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline mt-1 inline-block"
