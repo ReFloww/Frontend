@@ -1,77 +1,110 @@
+// swapAbi.ts
+
 export const abi = [
     {
-        type: "constructor",
-        stateMutability: "nonpayable",
-        inputs: [
+        "inputs": [
             {
-                name: "_usdtAddress",
-                type: "address",
-                internalType: "address",
-            },
+                "internalType": "address",
+                "name": "_usdtAddress",
+                "type": "address"
+            }
         ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        type: "error",
-        name: "ReentrancyGuardReentrantCall",
-        inputs: [],
+        "inputs": [],
+        "name": "ReentrancyGuardReentrantCall",
+        "type": "error"
     },
     {
-        type: "event",
-        name: "Swapped",
-        anonymous: false,
-        inputs: [
+        "inputs": [
             {
-                indexed: true,
-                name: "user",
-                type: "address",
-                internalType: "address",
-            },
-            {
-                indexed: true,
-                name: "fromToken",
-                type: "address",
-                internalType: "address",
-            },
-            {
-                indexed: true,
-                name: "toToken",
-                type: "address",
-                internalType: "address",
-            },
-            {
-                indexed: false,
-                name: "amountIn",
-                type: "uint256",
-                internalType: "uint256",
-            },
-            {
-                indexed: false,
-                name: "amountOut",
-                type: "uint256",
-                internalType: "uint256",
-            },
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
         ],
+        "name": "SafeERC20FailedOperation",
+        "type": "error"
     },
     {
-        type: "function",
-        name: "swap",
-        stateMutability: "nonpayable",
-        inputs: [
-            { name: "fromToken", type: "address", internalType: "address" },
-            { name: "toToken", type: "address", internalType: "address" },
-            { name: "amountIn", type: "uint256", internalType: "uint256" },
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "fromToken",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "toToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
         ],
-        outputs: [
-            { name: "amountOut", type: "uint256", internalType: "uint256" },
-        ],
+        "name": "Swapped",
+        "type": "event"
     },
     {
-        type: "function",
-        name: "usdtToken",
-        stateMutability: "view",
-        inputs: [],
-        outputs: [
-            { name: "", type: "address", internalType: "contract IERC20" },
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "fromToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "toToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
         ],
+        "name": "swap",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
-] as const;
+    {
+        "inputs": [],
+        "name": "usdtToken",
+        "outputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+] as const
