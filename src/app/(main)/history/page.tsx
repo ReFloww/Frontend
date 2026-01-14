@@ -179,8 +179,36 @@ export default function HistoryPage() {
                             {tx.type}
                           </span>
                         </TableCell>
-                        <TableCell className="font-mono text-xs">{shortenAddress(tx.from)}</TableCell>
-                        <TableCell className="font-mono text-xs">{shortenAddress(tx.to)}</TableCell>
+                        <TableCell>
+                          {tx.from ? (
+                            <a
+                              href={`https://sepolia.mantlescan.xyz/address/${tx.from}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
+                            >
+                              {shortenAddress(tx.from)}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="font-mono text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {tx.to ? (
+                            <a
+                              href={`https://sepolia.mantlescan.xyz/address/${tx.to}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
+                            >
+                              {shortenAddress(tx.to)}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="font-mono text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           {tx.amountIn !== '0' ? formatAmount(tx.amountIn) : formatAmount(tx.amountOut)} USDC
                         </TableCell>
