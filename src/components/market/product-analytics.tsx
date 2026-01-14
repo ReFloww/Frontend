@@ -10,9 +10,12 @@ import { fetchProductRepayments, ProductRepaymentItem } from '@/lib/api';
 
 interface ProductAnalyticsProps {
     product: Product;
+    totalSupply?: string;
+    maxSupply?: string;
+    tokenPrice?: number;
 }
 
-export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
+export default function ProductAnalytics({ product, totalSupply = '0', maxSupply = '0', tokenPrice = 1 }: ProductAnalyticsProps) {
     const [repayments, setRepayments] = useState<ProductRepaymentItem[]>([]);
     const [loadingRepayments, setLoadingRepayments] = useState(false);
     const [repaymentError, setRepaymentError] = useState<string | null>(null);
@@ -88,18 +91,27 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
                             <TabsContent value="investment" className="mt-4">
                                 <div className="space-y-6">
                                     {/* Investment Stats */}
-                                    <div>
-                                        <p className="text-sm text-muted-foreground mb-1">Total Investment</p>
-                                        <p className="text-3xl font-bold">
-                                            ${(product.loanAmount * 0.65).toLocaleString()}
-                                            <span className="text-lg text-muted-foreground font-normal">
-                                                {' '}/ ${product.loanAmount.toLocaleString()}
-                                            </span>
-                                        </p>
-                                        <p className="text-sm text-muted-foreground mt-1">
-                                            {((product.loanAmount * 0.65 / product.loanAmount) * 100).toFixed(1)}% of fundraising goal
-                                        </p>
-                                    </div>
+                                    {(() => {
+                                        // Calculate real investment from totalSupply * tokenPrice
+                                        const totalInvested = parseFloat(totalSupply) * tokenPrice;
+                                        const maxInvestment = parseFloat(maxSupply) * tokenPrice;
+                                        const investmentPercentage = maxInvestment > 0 ? (totalInvested / maxInvestment) * 100 : 0;
+                                        
+                                        return (
+                                            <div>
+                                                <p className="text-sm text-muted-foreground mb-1">Total Investment</p>
+                                                <p className="text-3xl font-bold">
+                                                    ${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                    <span className="text-lg text-muted-foreground font-normal">
+                                                        {' '}/ ${maxInvestment.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                    </span>
+                                                </p>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    {investmentPercentage.toFixed(1)}% of fundraising goal
+                                                </p>
+                                            </div>
+                                        );
+                                    })()}
 
                                     {/* Investment Chart */}
                                     <div className="relative w-full h-64">

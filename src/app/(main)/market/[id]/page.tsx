@@ -12,6 +12,7 @@ import ProductInformation from '@/components/market/product-information';
 import { getCreditRatingColor } from '@/lib/constants/product-market';
 import { fetchMarketItemById, MarketItem } from '@/lib/api';
 import { TokenizedProduct } from '@/types/product-market';
+import { useTokenP2P } from '@/hooks/useTokenP2P';
 
 // Icon mapping based on category
 const getCategoryIcon = (category: string | null | undefined) => {
@@ -67,6 +68,11 @@ export default function ProductDetailPage() {
     const [error, setError] = useState<string | null>(null);
     const [investmentAmount, setInvestmentAmount] = useState<string>('');
     const [calculation, setCalculation] = useState<LoanCalculation | null>(null);
+
+    // Get supply data from contract
+    const supplyData = useTokenP2P({ 
+        tokenP2PAddress: product?.tokenP2PAddress as `0x${string}` ?? '0x0000000000000000000000000000000000000000' 
+    });
 
     // Fetch product data on component mount
     useEffect(() => {
@@ -271,8 +277,13 @@ export default function ProductDetailPage() {
                 />
             </div>
 
-            {/* Product Analytics */}
-            <ProductAnalytics product={product} />
+            {/* Product Analytics - with real supply data from contract */}
+            <ProductAnalytics 
+                product={product} 
+                totalSupply={supplyData.totalSupply}
+                maxSupply={supplyData.maxSupply}
+                tokenPrice={supplyData.tokenPrice}
+            />
 
             {/* Product Information */}
             <ProductInformation product={product} />
