@@ -32,6 +32,8 @@ export default function ManagerInvestmentCard({
         userDeposit,
         userShares,
         sharePrice: contractSharePrice,
+        liquidFund,
+        totalShares,
         isConnected,
         isWritePending,
         isConfirmed,
@@ -108,10 +110,22 @@ export default function ManagerInvestmentCard({
         return parseFloat(depositAmount) > parseFloat(usdtBalance.toString());
     };
 
+    // Calculate max withdrawable shares based on liquid fund
+    // Max shares = min(userShares, shares that can be covered by liquid fund)
+    const getMaxWithdrawableShares = () => {
+        if (totalShares === 0 || contractSharePrice === 0) return userShares;
+        // Calculate how many shares can be withdrawn based on liquid fund
+        // liquidFund is in USDT, sharePrice is USDT per share
+        const sharesFromLiquid = liquidFund / contractSharePrice;
+        return Math.min(userShares, sharesFromLiquid);
+    };
+
+    const maxWithdrawableShares = getMaxWithdrawableShares();
+
     const isWithdrawAmountExceedingBalance = () => {
         if (!withdrawAmount || !isConnected) return false;
-        // Compare shares, not USDT
-        return parseFloat(withdrawAmount) > userShares;
+        // Compare against max withdrawable (min of userShares and what liquid fund allows)
+        return parseFloat(withdrawAmount) > maxWithdrawableShares;
     };
 
     const handleTabChange = (value: string) => {
@@ -163,6 +177,8 @@ export default function ManagerInvestmentCard({
                         withdrawAmount={withdrawAmount}
                         userShares={userShares.toString()}
                         userShareValue={userDeposit.toString()}
+                        maxWithdrawableShares={maxWithdrawableShares.toString()}
+                        liquidFund={liquidFund.toString()}
                         isConnected={isConnected}
                         isPending={isPending}
                         isSuccess={isConfirmed}

@@ -7,6 +7,8 @@ interface WithdrawTabProps {
     withdrawAmount: string;
     userShares: string;
     userShareValue: string;
+    maxWithdrawableShares: string;
+    liquidFund: string;
     isConnected: boolean;
     isPending: boolean;
     isSuccess: boolean;
@@ -22,6 +24,8 @@ export default function WithdrawTab({
     withdrawAmount,
     userShares,
     userShareValue,
+    maxWithdrawableShares,
+    liquidFund,
     isConnected,
     isPending,
     isSuccess,
@@ -40,7 +44,12 @@ export default function WithdrawTab({
                 <div className="flex justify-between items-center text-sm">
                     <label className="text-muted-foreground">Withdraw Shares</label>
                     <span className="text-xs text-muted-foreground">
-                        {isConnected ? `Shares: ${parseFloat(userShares).toLocaleString(undefined, { maximumFractionDigits: 4 })} (~$${parseFloat(userShareValue).toLocaleString(undefined, { maximumFractionDigits: 2 })})` : 'Connect wallet to see balance'}
+                        {isConnected ? (
+                            <>
+                                Max: {parseFloat(maxWithdrawableShares).toLocaleString(undefined, { maximumFractionDigits: 2 })} shares
+                                <span className="text-muted-foreground/70"> (Liquid: ${parseFloat(liquidFund).toLocaleString(undefined, { maximumFractionDigits: 2 })})</span>
+                            </>
+                        ) : 'Connect wallet to see balance'}
                     </span>
                 </div>
                 <div className="relative">
@@ -51,12 +60,12 @@ export default function WithdrawTab({
                         onChange={(e) => handleWithdrawAmountChange(e.target.value)}
                         className={`pr-20 h-14 text-lg ${isWithdrawAmountExceedingBalance() ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                     />
-                    {isConnected && parseFloat(userShares) > 0 && (
+                    {isConnected && parseFloat(maxWithdrawableShares) > 0 && (
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleWithdrawAmountChange(userShares)}
+                            onClick={() => handleWithdrawAmountChange(maxWithdrawableShares)}
                             className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10"
                         >
                             MAX
