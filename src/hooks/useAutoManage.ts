@@ -124,18 +124,41 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
     query: { enabled: !!managerAddress },
   });
 
-  const { data: totalDeposits, refetch: refetchTotalDeposits } = useReadContract({
+  const { data: totalShares, refetch: refetchTotalShares } = useReadContract({
     address: managerAddress,
     abi: managerInvestmentAbi,
-    functionName: 'totalDeposits',
+    functionName: 'totalShares',
     query: { enabled: !!managerAddress },
   });
 
-  // Read user's deposit in this manager
-  const { data: userDeposit, refetch: refetchUserDeposit } = useReadContract({
+  const { data: sharePrice, refetch: refetchSharePrice } = useReadContract({
     address: managerAddress,
     abi: managerInvestmentAbi,
-    functionName: 'userDeposits',
+    functionName: 'getSharePrice',
+    query: { enabled: !!managerAddress },
+  });
+
+  const { data: liquidFund, refetch: refetchLiquidFund } = useReadContract({
+    address: managerAddress,
+    abi: managerInvestmentAbi,
+    functionName: 'getLiquidFund',
+    query: { enabled: !!managerAddress },
+  });
+
+  // Read user's shares in this manager
+  const { data: userShares, refetch: refetchUserShares } = useReadContract({
+    address: managerAddress,
+    abi: managerInvestmentAbi,
+    functionName: 'userShares',
+    args: userAddress ? [userAddress] : undefined,
+    query: { enabled: !!managerAddress && !!userAddress },
+  });
+
+  // Read user's share value in USDT
+  const { data: userShareValue, refetch: refetchUserShareValue } = useReadContract({
+    address: managerAddress,
+    abi: managerInvestmentAbi,
+    functionName: 'getUserShareValue',
     args: userAddress ? [userAddress] : undefined,
     query: { enabled: !!managerAddress && !!userAddress },
   });
@@ -182,22 +205,26 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
     });
   };
 
-  // Withdraw USDT from manager
-  const withdraw = async (amount: string) => {
+  // Withdraw shares from manager (amount is in shares, not USDT)
+  const withdraw = async (shareAmount: string) => {
     if (!managerAddress) return;
-    const amountInWei = parseUnits(amount, 6);
+    // shareAmount is the number of shares to burn (18 decimals)
+    const sharesInWei = parseUnits(shareAmount, 18);
     writeContract({
       address: managerAddress,
       abi: managerInvestmentAbi,
       functionName: 'withdraw',
-      args: [amountInWei],
+      args: [sharesInWei],
     });
   };
 
   // Refetch all data
   const refetch = () => {
-    refetchTotalDeposits();
-    refetchUserDeposit();
+    refetchTotalShares();
+    refetchSharePrice();
+    refetchLiquidFund();
+    refetchUserShares();
+    refetchUserShareValue();
     refetchUsdtBalance();
     refetchAllowance();
   };
@@ -206,12 +233,18 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
     // Manager info
     name: name as string | undefined,
     owner: owner as `0x${string}` | undefined,
-    totalDeposits: totalDeposits ? parseFloat(formatUnits(totalDeposits as bigint, 6)) : 0,
-    rawTotalDeposits: totalDeposits as bigint | undefined,
+    totalShares: totalShares ? parseFloat(formatUnits(totalShares as bigint, 18)) : 0,
+    rawTotalShares: totalShares as bigint | undefined,
+    sharePrice: sharePrice ? parseFloat(formatUnits(sharePrice as bigint, 6)) : 1,
+    rawSharePrice: sharePrice as bigint | undefined,
+    liquidFund: liquidFund ? parseFloat(formatUnits(liquidFund as bigint, 6)) : 0,
+    rawLiquidFund: liquidFund as bigint | undefined,
 
     // User info
-    userDeposit: userDeposit ? parseFloat(formatUnits(userDeposit as bigint, 6)) : 0,
-    rawUserDeposit: userDeposit as bigint | undefined,
+    userShares: userShares ? parseFloat(formatUnits(userShares as bigint, 18)) : 0,
+    rawUserShares: userShares as bigint | undefined,
+    userDeposit: userShareValue ? parseFloat(formatUnits(userShareValue as bigint, 6)) : 0,
+    rawUserDeposit: userShareValue as bigint | undefined,
     usdtBalance: usdtBalance ? parseFloat(formatUnits(usdtBalance as bigint, 6)) : 0,
     rawUsdtBalance: usdtBalance as bigint | undefined,
     usdtAllowance: usdtAllowance ? parseFloat(formatUnits(usdtAllowance as bigint, 6)) : 0,

@@ -1,73 +1,34 @@
 export const managerInvestmentAbi = [
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_usdtAddress",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "_name",
-        type: "string",
-      },
+      { internalType: "address", name: "_usdtAddress", type: "address" },
+      { internalType: "string", name: "_name", type: "string" },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "owner", type: "address" }],
     name: "OwnableInvalidOwner",
     type: "error",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "OwnableUnauthorizedAccount",
     type: "error",
   },
+  { inputs: [], name: "ReentrancyGuardReentrantCall", type: "error" },
   {
-    inputs: [],
-    name: "ReentrancyGuardReentrantCall",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "token", type: "address" }],
     name: "SafeERC20FailedOperation",
     type: "error",
   },
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+      { indexed: true, internalType: "address", name: "user", type: "address" },
+      { indexed: false, internalType: "uint256", name: "usdtAmount", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "sharesMinted", type: "uint256" },
     ],
     name: "Deposit",
     type: "event",
@@ -75,24 +36,9 @@ export const managerInvestmentAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "projectToken",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amountTokenSold",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amountUsdtReceived",
-        type: "uint256",
-      },
+      { indexed: true, internalType: "address", name: "projectToken", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amountTokenSold", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "amountUsdtReceived", type: "uint256" },
     ],
     name: "Divested",
     type: "event",
@@ -100,24 +46,9 @@ export const managerInvestmentAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "projectToken",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amountUsdtSpent",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amountTokenReceived",
-        type: "uint256",
-      },
+      { indexed: true, internalType: "address", name: "projectToken", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amountUsdtSpent", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "amountTokenReceived", type: "uint256" },
     ],
     name: "Invested",
     type: "event",
@@ -125,18 +56,8 @@ export const managerInvestmentAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
+      { indexed: true, internalType: "address", name: "previousOwner", type: "address" },
+      { indexed: true, internalType: "address", name: "newOwner", type: "address" },
     ],
     name: "OwnershipTransferred",
     type: "event",
@@ -144,34 +65,17 @@ export const managerInvestmentAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+      { indexed: true, internalType: "address", name: "user", type: "address" },
+      { indexed: false, internalType: "uint256", name: "sharesBurned", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "usdtReceived", type: "uint256" },
     ],
     name: "Withdraw",
     type: "event",
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_projectAddress",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_usdtAmount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "_projectAddress", type: "address" },
+      { internalType: "uint256", name: "_usdtAmount", type: "uint256" },
     ],
     name: "allocateFunds",
     outputs: [],
@@ -179,13 +83,7 @@ export const managerInvestmentAbi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
     name: "deposit",
     outputs: [],
     stateMutability: "nonpayable",
@@ -193,27 +91,71 @@ export const managerInvestmentAbi = [
   },
   {
     inputs: [],
+    name: "getAUM",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getInvestedProjectsCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getLiquidFund",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getLockedFundValue",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getSharePrice",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "getUserShareValue",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "investedProjects",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isInvestedProject",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "name",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
+    outputs: [{ internalType: "string", name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "address", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
@@ -226,16 +168,8 @@ export const managerInvestmentAbi = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_projectAddress",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_tokenAmount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "_projectAddress", type: "address" },
+      { internalType: "uint256", name: "_tokenAmount", type: "uint256" },
     ],
     name: "sellAsset",
     outputs: [],
@@ -244,70 +178,34 @@ export const managerInvestmentAbi = [
   },
   {
     inputs: [],
-    name: "totalDeposits",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    name: "totalShares",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "userDeposits",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "usdtToken",
-    outputs: [
-      {
-        internalType: "contract IERC20",
-        name: "",
-        type: "address",
-      },
-    ],
+    outputs: [{ internalType: "contract IERC20", name: "", type: "address" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "userShares",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "shareAmount", type: "uint256" }],
     name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",

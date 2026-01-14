@@ -5,7 +5,8 @@ import { Info, TrendingUp, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface WithdrawTabProps {
     withdrawAmount: string;
-    userDeposit: string;
+    userShares: string;
+    userShareValue: string;
     isConnected: boolean;
     isPending: boolean;
     isSuccess: boolean;
@@ -19,7 +20,8 @@ interface WithdrawTabProps {
 
 export default function WithdrawTab({
     withdrawAmount,
-    userDeposit,
+    userShares,
+    userShareValue,
     isConnected,
     isPending,
     isSuccess,
@@ -36,9 +38,9 @@ export default function WithdrawTab({
         <TabsContent value="withdraw" className="space-y-4 mt-4">
             <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
-                    <label className="text-muted-foreground">Withdraw Amount</label>
+                    <label className="text-muted-foreground">Withdraw Shares</label>
                     <span className="text-xs text-muted-foreground">
-                        {isConnected ? `Deposit Balance: $${userDeposit}` : 'Connect wallet to see balance'}
+                        {isConnected ? `Shares: ${parseFloat(userShares).toLocaleString(undefined, { maximumFractionDigits: 4 })} (~$${parseFloat(userShareValue).toLocaleString(undefined, { maximumFractionDigits: 2 })})` : 'Connect wallet to see balance'}
                     </span>
                 </div>
                 <div className="relative">
@@ -49,12 +51,12 @@ export default function WithdrawTab({
                         onChange={(e) => handleWithdrawAmountChange(e.target.value)}
                         className={`pr-20 h-14 text-lg ${isWithdrawAmountExceedingBalance() ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                     />
-                    {isConnected && parseFloat(userDeposit) > 0 && (
+                    {isConnected && parseFloat(userShares) > 0 && (
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleWithdrawAmountChange(userDeposit)}
+                            onClick={() => handleWithdrawAmountChange(userShares)}
                             className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10"
                         >
                             MAX

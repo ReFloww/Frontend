@@ -30,6 +30,8 @@ export default function ManagerInvestmentCard({
     const {
         usdtBalance,
         userDeposit,
+        userShares,
+        sharePrice: contractSharePrice,
         isConnected,
         isWritePending,
         isConfirmed,
@@ -80,6 +82,7 @@ export default function ManagerInvestmentCard({
     const handleWithdraw = () => {
         if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) return;
         setStep('confirm');
+        // withdrawAmount is in shares, pass directly to withdraw
         withdraw(withdrawAmount);
     };
 
@@ -107,7 +110,8 @@ export default function ManagerInvestmentCard({
 
     const isWithdrawAmountExceedingBalance = () => {
         if (!withdrawAmount || !isConnected) return false;
-        return parseFloat(withdrawAmount) > parseFloat(userDeposit.toString());
+        // Compare shares, not USDT
+        return parseFloat(withdrawAmount) > userShares;
     };
 
     const handleTabChange = (value: string) => {
@@ -157,7 +161,8 @@ export default function ManagerInvestmentCard({
 
                     <WithdrawTab
                         withdrawAmount={withdrawAmount}
-                        userDeposit={userDeposit.toString()}
+                        userShares={userShares.toString()}
+                        userShareValue={userDeposit.toString()}
                         isConnected={isConnected}
                         isPending={isPending}
                         isSuccess={isConfirmed}
