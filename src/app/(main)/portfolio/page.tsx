@@ -248,7 +248,7 @@ export default function PortfolioPage() {
                   </p>
                   <Button
                     className="mt-4 bg-[#225B3A] hover:bg-[#1C4A30]"
-                    onClick={() => router.push('/auto-manage')}
+                    onClick={() => router.push('/investment-funds')}
                   >
                     Browse Managers
                   </Button>
@@ -274,7 +274,7 @@ export default function PortfolioPage() {
                         <div
                           key={investment.managerId}
                           className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                          onClick={() => router.push(`/auto-manage/${investment.managerId}`)}
+                          onClick={() => router.push(`/investment-funds/${investment.managerId}`)}
                         >
                           {/* Manager Avatar */}
                           <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-white border border-gray-100 flex items-center justify-center p-1">
@@ -331,7 +331,7 @@ export default function PortfolioPage() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => router.push('/auto-manage')}
+                    onClick={() => router.push('/investment-funds')}
                   >
                     Browse More Managers
                   </Button>
