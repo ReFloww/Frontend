@@ -208,8 +208,8 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
   // Withdraw shares from manager (amount is in shares, not USDT)
   const withdraw = async (shareAmount: string) => {
     if (!managerAddress) return;
-    // shareAmount is the number of shares to burn (18 decimals)
-    const sharesInWei = parseUnits(shareAmount, 18);
+    // shareAmount is the number of shares to burn (6 decimals like USDT)
+    const sharesInWei = parseUnits(shareAmount, 6);
     writeContract({
       address: managerAddress,
       abi: managerInvestmentAbi,
@@ -233,7 +233,7 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
     // Manager info
     name: name as string | undefined,
     owner: owner as `0x${string}` | undefined,
-    totalShares: totalShares ? parseFloat(formatUnits(totalShares as bigint, 18)) : 0,
+    totalShares: totalShares ? parseFloat(formatUnits(totalShares as bigint, 6)) : 0,
     rawTotalShares: totalShares as bigint | undefined,
     sharePrice: sharePrice ? parseFloat(formatUnits(sharePrice as bigint, 6)) : 1,
     rawSharePrice: sharePrice as bigint | undefined,
@@ -241,7 +241,7 @@ export function useManagerInvestment(managerAddress: `0x${string}` | undefined) 
     rawLiquidFund: liquidFund as bigint | undefined,
 
     // User info
-    userShares: userShares ? parseFloat(formatUnits(userShares as bigint, 18)) : 0,
+    userShares: userShares ? parseFloat(formatUnits(userShares as bigint, 6)) : 0,
     rawUserShares: userShares as bigint | undefined,
     userDeposit: userShareValue ? parseFloat(formatUnits(userShareValue as bigint, 6)) : 0,
     rawUserDeposit: userShareValue as bigint | undefined,
