@@ -69,12 +69,12 @@ export default function HistoryPage() {
     return date.toLocaleDateString();
   };
 
-  // Helper function to format amount (convert from wei to readable format)
+  // Helper function to format amount (convert from raw format with 6 decimals to readable format)
   const formatAmount = (amount: string) => {
     const num = BigInt(amount);
-    const divisor = BigInt(10 ** 18);
+    const divisor = BigInt(10 ** 6); // USDT/USDC uses 6 decimals
     const result = Number(num) / Number(divisor);
-    return result.toFixed(2);
+    return result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   // Helper function to shorten address
