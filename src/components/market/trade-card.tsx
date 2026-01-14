@@ -81,20 +81,28 @@ export default function TradeCard({
     }, [isSuccess, isApproving, step]);
 
     const handleBuyAmountChange = (value: string) => {
-        setBuyAmount(value);
+        let numValue = parseFloat(value);
+        
+        // Calculate tokens based on input amount
+        if (!isNaN(numValue) && numValue > 0 && tokenPrice > 0) {
+            let tokensToReceive = numValue / tokenPrice;
+            
+            // If tokens exceed available supply, cap to max available
+            if (tokensToReceive > availableSupply && availableSupply > 0) {
+                tokensToReceive = availableSupply;
+                numValue = tokensToReceive * tokenPrice;
+                value = numValue.toFixed(2);
+            }
+            
+            setBuyAmount(value);
+            setBuyReceiveAmount(tokensToReceive.toFixed(2));
+        } else {
+            setBuyAmount(value);
+            setBuyReceiveAmount('');
+        }
 
         if (onAmountChange) {
             onAmountChange(value);
-        }
-
-        // Calculate tokens to receive based on token price
-        // Tokens = USDT amount / token price
-        const numValue = parseFloat(value);
-        if (!isNaN(numValue) && numValue > 0 && tokenPrice > 0) {
-            const tokensToReceive = numValue / tokenPrice;
-            setBuyReceiveAmount(tokensToReceive.toFixed(2));
-        } else {
-            setBuyReceiveAmount('');
         }
     };
 
