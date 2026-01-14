@@ -65,7 +65,15 @@ export default function ManagerInvestmentCard({
     };
 
     const handleWithdrawAmountChange = (value: string) => {
-        setWithdrawAmount(value);
+        const numValue = parseFloat(value);
+        const maxShares = getMaxWithdrawableShares();
+        
+        // Auto-cap to max withdrawable shares if exceeded
+        if (!isNaN(numValue) && numValue > maxShares && maxShares > 0) {
+            setWithdrawAmount(maxShares.toString());
+        } else {
+            setWithdrawAmount(value);
+        }
     };
 
     const handleDeposit = () => {
