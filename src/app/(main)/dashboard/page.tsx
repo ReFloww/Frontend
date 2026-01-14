@@ -322,7 +322,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-muted-foreground">Total Value:</span>
                       <span className="font-semibold text-[#0A6A74]">
-                        ${totalDistributionValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
