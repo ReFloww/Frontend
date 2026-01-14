@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SwapCard from '@/components/swap/swap-card';
 import { fetchMarketList, MarketItem } from '@/lib/api';
@@ -41,7 +41,8 @@ const mapApiToProduct = (item: MarketItem): TokenizedProduct => ({
   icon: getCategoryIcon(item.categoryId),
 });
 
-export default function SwapPage() {
+// Separate component that uses useSearchParams
+function SwapPageContent() {
   const searchParams = useSearchParams();
   const sellTokenParam = searchParams.get('sellToken');
 
@@ -108,5 +109,26 @@ export default function SwapPage() {
         <SwapCard products={products} initialSellTokenId={sellTokenParam} />
       </div>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function SwapPageLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+        <p className="text-muted-foreground">Loading swap...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main export wrapped in Suspense
+export default function SwapPage() {
+  return (
+    <Suspense fallback={<SwapPageLoading />}>
+      <SwapPageContent />
+    </Suspense>
   );
 }
