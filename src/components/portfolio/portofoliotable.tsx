@@ -13,7 +13,8 @@ interface PortfolioAsset {
   categoryId: string;
   icon: React.ComponentType<{ className?: string }>;
   balance: number;
-  value?: number;
+  tokenPrice?: number;
+  usdValue?: number;
   returnPercent?: number;
 }
 
@@ -92,9 +93,9 @@ export default function PortfolioTable({
               <tbody>
                 {activeAssets.map((asset) => {
                   const AssetIcon = asset.icon;
-                  // Mock data for value and return if not provided
-                  const value = asset.value || asset.balance * 100;
-                  const returnPercent = asset.returnPercent || (Math.random() * 15 + 2);
+                  // Use real USD value from contract price, fallback to balance if not available
+                  const value = asset.usdValue ?? asset.balance;
+                  const returnPercent = asset.returnPercent ?? 0;
 
                   return (
                     <tr

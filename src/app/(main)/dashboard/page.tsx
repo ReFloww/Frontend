@@ -255,7 +255,7 @@ export default function DashboardPage() {
                         </>
                       ) : (
                         <>
-                          <div className="text-3xl font-bold text-[#0A6A74]">{totalAssets}</div>
+                          <div className="text-3xl font-bold text-[#0A6A74]">{totalValue}</div>
                           <div className="text-xs text-muted-foreground">Assets</div>
                         </>
                       )}
