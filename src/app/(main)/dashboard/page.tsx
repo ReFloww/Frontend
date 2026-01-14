@@ -105,21 +105,8 @@ export default function DashboardPage() {
     };
   }).filter(sector => sector.count > 0); // Only show sectors with assets
 
-  // Add USDT to distribution if balance exists
-  const assetDistribution = [
-    ...p2pDistribution,
-    ...(usdtBalance > 0 ? [{
-      sector: 'USDT',
-      count: 1,
-      value: usdtBalance,
-      color: '#6B7280',
-      icon: DollarSign,
-      products: [{
-        name: 'USDT Balance',
-        value: `$${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-      }]
-    }] : [])
-  ];
+  // Asset distribution only contains P2P tokens (no USDT)
+  const assetDistribution = p2pDistribution;
 
   const totalAssets = assetDistribution.reduce((sum, item) => sum + item.count, 0);
   const totalDistributionValue = assetDistribution.reduce((sum, item) => sum + item.value, 0);
