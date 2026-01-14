@@ -1,15 +1,63 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, ArrowUpNarrowWide } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TrendingUp, ArrowUpNarrowWide, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { Product } from '@/lib/constants/product-market';
+import { fetchProductRepayments, ProductRepaymentItem } from '@/lib/api';
 
 interface ProductAnalyticsProps {
     product: Product;
 }
 
 export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
+    const [repayments, setRepayments] = useState<ProductRepaymentItem[]>([]);
+    const [loadingRepayments, setLoadingRepayments] = useState(false);
+    const [repaymentError, setRepaymentError] = useState<string | null>(null);
+
+    // Fetch repayment records when switching to repayment tab
+    const handleTabChange = (value: string) => {
+        if (value === 'repayment' && repayments.length === 0 && !loadingRepayments) {
+            loadRepayments();
+        }
+    };
+
+    const loadRepayments = async () => {
+        try {
+            setLoadingRepayments(true);
+            setRepaymentError(null);
+            const data = await fetchProductRepayments(product.id);
+            setRepayments(data);
+        } catch (err) {
+            console.error('Error loading repayments:', err);
+            setRepaymentError('Failed to load repayment records');
+        } finally {
+            setLoadingRepayments(false);
+        }
+    };
+
+    // Format timestamp to date
+    const formatDate = (timestamp: string) => {
+        const date = new Date(parseInt(timestamp) * 1000);
+        return date.toLocaleDateString();
+    };
+
+    // Format amount (convert from raw format with 6 decimals)
+    const formatAmount = (amount: string) => {
+        const num = BigInt(amount);
+        const divisor = BigInt(10 ** 6);
+        const result = Number(num) / Number(divisor);
+        return result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    // Shorten transaction hash
+    const shortenHash = (hash: string) => {
+        if (!hash) return '';
+        return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+    };
+
     return (
         <Card className="border-2">
             <CardHeader>
@@ -17,7 +65,7 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
                 <CardDescription>View detailed information about this product</CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="overview" className="w-full">
+                <Tabs defaultValue="overview" className="w-full" onValueChange={handleTabChange}>
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="overview" className="cursor-pointer">Overview</TabsTrigger>
                         <TabsTrigger value="repayment" className="cursor-pointer">Repayment Record</TabsTrigger>
@@ -131,7 +179,7 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
 
                                             {/* Y-axis labels (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20) */}
                                             {[0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20].map((value) => {
-                                                const y = 300 - (value * 13); // Scale: 0% at y=300, 20% at y=40
+                                                const y = 300 - (value * 13);
                                                 return (
                                                     <text
                                                         key={value}
@@ -178,28 +226,19 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
 
                                             {/* Mock data points (fluctuating between 8-12%) */}
                                             {(() => {
-                                                // Y values between 8-12%: [9.5, 11, 10.5, 9, 11.5, 10, 9.5, 11, 10.5, 12, 10, 9]
                                                 const yieldValues = [9.5, 11, 10.5, 9, 11.5, 10, 9.5, 11, 10.5, 12, 10, 9];
                                                 const points = yieldValues.map((value, index) => {
                                                     const x = 80 + (index * 60);
-                                                    const y = 300 - (value * 13); // Scale: each 1% = 13 pixels
+                                                    const y = 300 - (value * 13);
                                                     return `${x},${y}`;
                                                 });
 
                                                 const pathData = `M ${points.join(' L ')}`;
-
-                                                // Create area path (same as line but closed at bottom)
                                                 const areaData = `M 80,300 L ${points.join(' L ')} L 740,300 Z`;
 
                                                 return (
                                                     <>
-                                                        {/* Area with gradient */}
-                                                        <path
-                                                            d={areaData}
-                                                            fill="url(#yieldGradient)"
-                                                        />
-
-                                                        {/* Line */}
+                                                        <path d={areaData} fill="url(#yieldGradient)" />
                                                         <path
                                                             d={pathData}
                                                             fill="none"
@@ -208,8 +247,6 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
                                                             strokeLinecap="round"
                                                             strokeLinejoin="round"
                                                         />
-
-                                                        {/* Data points */}
                                                         {points.map((point, index) => {
                                                             const [x, y] = point.split(',').map(Number);
                                                             return (
@@ -235,9 +272,60 @@ export default function ProductAnalytics({ product }: ProductAnalyticsProps) {
                     </TabsContent>
 
                     <TabsContent value="repayment" className="mt-6">
-                        <div className="flex items-center justify-center py-12 text-muted-foreground">
-                            Repayment records will be displayed here
-                        </div>
+                        {loadingRepayments ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                <span className="ml-2 text-muted-foreground">Loading repayment records...</span>
+                            </div>
+                        ) : repaymentError ? (
+                            <div className="flex flex-col items-center justify-center py-12 text-destructive">
+                                <AlertCircle className="h-8 w-8 mb-2" />
+                                <p>{repaymentError}</p>
+                            </div>
+                        ) : repayments.length === 0 ? (
+                            <div className="flex items-center justify-center py-12 text-muted-foreground">
+                                No repayment records found for this product
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Repayment #</TableHead>
+                                        <TableHead>Principal</TableHead>
+                                        <TableHead>Interest</TableHead>
+                                        <TableHead>Transaction Hash</TableHead>
+                                        <TableHead>Date</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {repayments.map((rep, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+                                                    #{rep.repaymentNumber}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell>{formatAmount(rep.principal)} USDC</TableCell>
+                                            <TableCell>{formatAmount(rep.interestPaid)} USDC</TableCell>
+                                            <TableCell>
+                                                <a
+                                                    href={`https://sepolia.mantlescan.xyz/tx/${rep.transactionHash}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
+                                                >
+                                                    {shortenHash(rep.transactionHash)}
+                                                    <ExternalLink className="h-3 w-3" />
+                                                </a>
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {formatDate(rep.timestamp)}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
                     </TabsContent>
                 </Tabs>
             </CardContent>

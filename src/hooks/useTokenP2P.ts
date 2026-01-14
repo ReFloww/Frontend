@@ -74,14 +74,25 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
         functionName: 'totalSupply',
     });
 
+    // Read token price (USDT per token with 6 decimals)
+    const { data: tokenPrice, refetch: refetchTokenPrice } = useReadContract({
+        address: tokenP2PAddress,
+        abi: tokenP2PAbi,
+        functionName: 'getTokenPrice',
+        query: {
+            refetchInterval: 10000,
+        },
+    });
+
     // Refetch all balances when transaction is successful
     useEffect(() => {
         if (isSuccess) {
             refetchP2pBalance();
             refetchUsdtBalance();
             refetchAllowance();
+            refetchTokenPrice();
         }
-    }, [isSuccess, refetchP2pBalance, refetchUsdtBalance, refetchAllowance]);
+    }, [isSuccess, refetchP2pBalance, refetchUsdtBalance, refetchAllowance, refetchTokenPrice]);
 
     // Write functions - all use the SPECIFIC tokenP2PAddress
     const approveUSDT = (amount: string) => {
@@ -171,6 +182,10 @@ export function useTokenP2P({ tokenP2PAddress }: UseTokenP2PProps) {
         // Supply data
         maxSupply: maxSupply ? formatUnits(maxSupply, 6) : '0',
         totalSupply: totalSupply ? formatUnits(totalSupply, 6) : '0',
+
+        // Token price (USDT per token)
+        tokenPrice: tokenPrice ? parseFloat(formatUnits(tokenPrice, 6)) : 1,
+        rawTokenPrice: tokenPrice,
 
         // Actions
         approveUSDT,

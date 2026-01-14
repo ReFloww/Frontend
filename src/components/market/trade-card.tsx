@@ -39,6 +39,9 @@ export default function TradeCard({
     const {
         usdtBalance,
         p2pBalance,
+        tokenPrice,
+        maxSupply,
+        totalSupply,
         isConnected,
         isPending,
         isSuccess,
@@ -48,6 +51,9 @@ export default function TradeCard({
         buyTokens,
         sellTokens,
     } = useTokenP2P({ tokenP2PAddress });
+
+    // Calculate available supply (how many tokens can still be minted)
+    const availableSupply = parseFloat(maxSupply) - parseFloat(totalSupply);
 
     // Mock exchange rate and fees
     const platformFee = 0.5; // 0.5% platform fee
@@ -81,10 +87,12 @@ export default function TradeCard({
             onAmountChange(value);
         }
 
-        // Set receive amount to match buy amount (1:1 ratio)
+        // Calculate tokens to receive based on token price
+        // Tokens = USDT amount / token price
         const numValue = parseFloat(value);
-        if (!isNaN(numValue) && numValue > 0) {
-            setBuyReceiveAmount(numValue.toFixed(2));
+        if (!isNaN(numValue) && numValue > 0 && tokenPrice > 0) {
+            const tokensToReceive = numValue / tokenPrice;
+            setBuyReceiveAmount(tokensToReceive.toFixed(2));
         } else {
             setBuyReceiveAmount('');
         }
@@ -141,6 +149,12 @@ export default function TradeCard({
         return parseFloat(buyAmount) > parseFloat(usdtBalance);
     };
 
+    // Check if tokens to buy exceeds available supply
+    const isBuyAmountExceedingSupply = () => {
+        if (!buyReceiveAmount || !isConnected) return false;
+        return parseFloat(buyReceiveAmount) > availableSupply;
+    };
+
     const isSellAmountExceedingBalance = () => {
         if (!sellAmount || !isConnected) return false;
         return parseFloat(sellAmount) > parseFloat(p2pBalance);
@@ -189,7 +203,9 @@ export default function TradeCard({
                         step={step}
                         symbol={symbol}
                         platformFee={platformFee}
+                        availableSupply={availableSupply}
                         isBuyAmountExceedingBalance={isBuyAmountExceedingBalance}
+                        isBuyAmountExceedingSupply={isBuyAmountExceedingSupply}
                         handleBuyAmountChange={handleBuyAmountChange}
                         calculateFee={calculateFee}
                         handleInvest={handleInvest}

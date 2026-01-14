@@ -14,7 +14,9 @@ interface BuyTabProps {
     step: 'input' | 'approve' | 'confirm';
     symbol: string;
     platformFee: number;
+    availableSupply: number;
     isBuyAmountExceedingBalance: () => boolean;
+    isBuyAmountExceedingSupply: () => boolean;
     handleBuyAmountChange: (value: string) => void;
     calculateFee: (amount: string) => string;
     handleInvest: () => void;
@@ -30,7 +32,9 @@ export default function BuyTab({
     step,
     symbol,
     platformFee,
+    availableSupply,
     isBuyAmountExceedingBalance,
+    isBuyAmountExceedingSupply,
     handleBuyAmountChange,
     calculateFee,
     handleInvest,
@@ -69,6 +73,11 @@ export default function BuyTab({
                         Insufficient USDT balance
                     </p>
                 )}
+                {isBuyAmountExceedingSupply() && !isBuyAmountExceedingBalance() && (
+                    <p className="text-xs text-red-600 dark:text-red-400">
+                        Exceeds available supply ({availableSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} tokens remaining)
+                    </p>
+                )}
             </div>
 
             {/* Transaction Details */}
@@ -98,7 +107,7 @@ export default function BuyTab({
                 className="w-full h-12 text-base bg-[#225B3A] hover:bg-[#1C4A30] cursor-pointer"
                 size="lg"
                 onClick={handleInvest}
-                disabled={!isConnected || !buyAmount || parseFloat(buyAmount) <= 0 || isPending || isBuyAmountExceedingBalance()}
+                disabled={!isConnected || !buyAmount || parseFloat(buyAmount) <= 0 || isPending || isBuyAmountExceedingBalance() || isBuyAmountExceedingSupply()}
             >
                 {isPending ? (
                     <>

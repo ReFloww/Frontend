@@ -276,3 +276,39 @@ export async function fetchRepaymentHistory(userAddress: string): Promise<Repaym
         throw error;
     }
 }
+
+/**
+ * Product Repayment Record (for product detail page)
+ */
+export interface ProductRepaymentItem {
+    repaymentNumber: string;
+    principal: string;
+    interestPaid: string;
+    timestamp: string;
+    transactionHash: string;
+}
+
+/**
+ * Fetch repayment records for a specific product
+ */
+export async function fetchProductRepayments(productId: string): Promise<ProductRepaymentItem[]> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/market/${productId}/repayments`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const result: ProductRepaymentItem[] = await response.json();
+        return result || [];
+    } catch (error) {
+        console.error('Failed to fetch product repayments:', error);
+        throw error;
+    }
+}
